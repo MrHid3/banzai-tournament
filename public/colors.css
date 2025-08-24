@@ -1,0 +1,11 @@
+:root{
+    --bg-primary: #242e35;
+    --bg-secondary: #1d1d1b;
+    --bg-action: #ffffff;
+
+    --text-primary: #a0969a;
+    --text-active: #ffffff;
+    --text-inactive: #a3a7a2;
+
+    --highlight: #cc0000;
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dodawanie</title>
+    <link rel="stylesheet" href="addCompetitors/addCompetitors.css">
+</head>
+<body>
+<div id="container">
+    <div id="top-bar">
+        <select name="location" id="location-select">
+            <option value="0" disabled selected>Wybierz lokalizację</option>
+        </select>
+        <button id="send-button">WYŚLIJ</button>
+    </div>
+    <div id="competitors-container">
+        <div id="thead-phone">
+            <span>Imię</span>
+            <span>Nazwisko</span>
+            <span>Wiek</span>
+            <span>Waga</span>
+            <span>Pas</span>
+            <span>Belka</span>
+        </div>
+        <div id="table-wrapper">
+            <table id="competitors-table">
+                <thead>
+                <tr>
+                    <th>Imię</th>
+                    <th>Nazwisko</th>
+                    <th>Wiek</th>
+                    <th>Waga</th>
+                    <th>Pas</th> <!-- to może -->
+                    <th>Belka</th> <!-- się zmienić -->
+                    <th></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <button id="add-competitor-button">+</button>
+    </div>
+</div>
+<script>
+    const backendURL = "{{{backendURL}}}";
+</script>
+<script src="addCompetitors/addCompetitors.js" type="module"></script>
+</body>
+</html>

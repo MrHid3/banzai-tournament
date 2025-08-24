@@ -1,0 +1,228 @@
+@import url('../colors.css');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 0;
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
+}
+
+body{
+    /*width: 100vw;*/
+    /*height: 100%;*/
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    /*overflow-y: scroll;*/
+}
+
+#top-bar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px 12px;
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--text-inactive);
+    z-index: 420;
+}
+
+#top-bar *{
+    padding: 5px;
+}
+
+div#container{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: 10px auto;
+}
+
+#competitors-container{
+    padding: 10px;
+}
+
+button{
+    height: 40px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#add-competitor-button{
+    display: block;
+    width: calc(100% - 4px);
+    background-color: var(--highlight);
+    color: var(--text-active);
+    margin: 5px auto;
+}
+
+#location-select{
+    height: 40px;
+}
+
+#send-button{
+    background-color: var(--highlight);
+    color: var(--text-active);
+}
+
+.delete-button{
+    padding: 5px;
+    width: 30px;
+    height: 30px;
+    background-color: var(--bg-action);
+    color: var(--text-inactive);
+}
+
+.delete-button:hover{
+    background-color: var(--bg-secondary);
+    color: var(--text-active);
+}
+
+#table-wrapper{
+    overflow-y: scroll;
+    max-height: 605px;
+    /*max-height: 200px;*/
+}
+
+table{
+    width: min-content;
+    margin: 0 auto;
+}
+
+thead{
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: var(--bg-primary);
+    width: 100%;
+}
+
+thead > tr > th{
+    padding: 5px;
+}
+
+table, tr{
+    padding: 2px 0;
+    width: 100%;
+}
+
+td{
+    padding: 2px;
+}
+
+td:first-child{
+    padding: 2px 2px 2px 0;
+}
+
+td:last-child{
+    padding: 2px 0 2px 2px;
+}
+
+input{
+    padding: 5px;
+    height: 30px;
+    background-color: var(--bg-action);
+    text-align: center;
+    font-weight: bold;
+}
+
+select {
+    background-color: var(--bg-action);
+    padding: 5px;
+    font-weight: bold;
+    height: 30px;
+    text-align: center;
+    text-align-last: center;
+    -moz-text-align-last: center;
+}
+
+option{
+    text-align: left;
+}
+
+option[disabled] {
+    display: none;
+}
+
+.error > * > * {
+    background-color: rgb(255, 178, 15);
+    color: var(--highlight);
+    /*border-top: 1px solid var(--text-active);*/
+    /*border-bottom: 1px solid var(--text-active);*/
+    /*margin: 2px;*/
+}
+
+@media only screen and (max-width: 1100px) {
+    td{
+        padding: 2px !important;
+    }
+
+    table > tr{
+        display: flex;
+        flex-direction: column;
+    }
+
+    #competitors-container{
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+
+    #table-wrapper{
+        max-height: 240px;
+        scroll-snap-type: y mandatory;
+    }
+
+    tr{
+        scroll-snap-align: start;
+    }
+
+    thead{
+        display: none;
+    }
+
+    #thead-phone{
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 16px;
+        width: 80px;
+        left: -80px;
+        height: fit-content;
+    }
+
+    #thead-phone span{
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        display: block;
+        font-weight: bold;
+        margin: 2px;
+        text-align: end;
+    }
+
+    input, select, .delete-button{
+        width: 100%;
+    }
+
+    #add-competitor-button{
+        width: calc(100% - 8px);
+    }
+}
+
+#thead-phone{
+    display: none;
+}
+
+/*usunięcie strzałek z input type number*/
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
