@@ -84,13 +84,10 @@ async function send(){
                 competitors[i][children[j].children[0].name] = children[j].children[0].value;
             }
         }
-        console.log(competitors);
         wrong.reverse()
         wrong.forEach((element) => {
-            console.log(element);
             competitors.splice(element, 1);
         })
-        console.log(competitors);
         const errors = document.querySelectorAll("#competitors-table .error");
         errors.forEach(el => {
             el.classList.remove("error")
