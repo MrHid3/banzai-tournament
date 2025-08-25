@@ -2,10 +2,8 @@ async function getResource(resourceName) {
     const request = await fetch(resourceName);
     return await request.json();
 }
-const belts = [];
-console.log(`${backendURL}/resources/locations.json`)
+
 const locations = await getResource(`${backendURL}/resources/locations.json`);
-// const locations = [];
 
 const locationSelect = document.querySelector('#location-select');
 const competitorsTable = document.querySelector("#competitors-table");
@@ -33,25 +31,19 @@ function addCompetitor() {
         td.appendChild(input);
         tr.appendChild(td);
     }
-    let beltTd = document.createElement("td");
-    let beltSelect = document.createElement("select");
-    beltSelect.name = "belt";
-    for (let i = 0; i < belts.length; i++) {
+    let levelTd = document.createElement("td");
+    let levelSelect = document.createElement("select");
+    levelSelect.name = "level";
+    const levels = ["1 (<1 rok)", "2 (1-3 lata)", "3 (3+ lat)"]
+    for (let i = 1; i <= levels.length; i++) {
         const option = document.createElement("option");
         option.value = i;
-        option.text = belts[i].polish;
-        beltSelect.appendChild(option);
-        beltSelect.classList.add(`belt-${competitorNumber}`)
-        beltSelect.oninput = showStripes;
+        option.text = levels[i - 1];
+        levelSelect.appendChild(option);
+        levelSelect.classList.add(`level-${competitorNumber}`)
     }
-    beltTd.appendChild(beltSelect);
-    tr.appendChild(beltTd);
-    const stripeTd = document.createElement("td");
-    const stripeSelect = document.createElement("select");
-    stripeSelect.name = "stripe";
-    stripeSelect.classList.add(`stripe-${competitorNumber}`);
-    stripeTd.appendChild(stripeSelect);
-    tr.appendChild(stripeTd);
+    levelTd.appendChild(levelSelect);
+    tr.appendChild(levelTd);
     const deleteButtonTd = document.createElement("td");
     const deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button")
@@ -60,14 +52,6 @@ function addCompetitor() {
     deleteButtonTd.appendChild(deleteButton);
     tr.appendChild(deleteButtonTd);
     competitorsTable.appendChild(tr);
-    showStripes({target: beltSelect})
-}
-
-function showStripes(e){
-    const stripeForm = e.target.parentElement.parentElement.children[5].children[0];
-    const beltForm = e.target;
-    while (stripeForm.length > 0)
-         stripeForm.removeChild(stripeForm.firstChild);
 }
 
 function deleteCompetitor(e){
@@ -85,29 +69,28 @@ async function send(){
     }
     if(confirm("Na pewno?")){
         let competitors = [];
-        const categories = ["name", "surname", "age", "weight"];
-        for(let i = 0; i < competitorNumber; i++){
-            competitors.push([]);
-        }
-        categories.forEach(category => {
-            const inputs = document.querySelectorAll(`input[name="${category}"]`);
-            inputs.forEach((input, j) => {
-                competitors[j].push(input.value);
-            })
-        })
         let wrong = [];
-        competitors = competitors.filter((competitor, index) => {
-            let keep = true;
-            competitor.forEach(el => {
-                if (el == ""){
-                    keep = false;
+        const competitorRows = document.querySelectorAll("tr.competitor")
+        for(let i = 0; i < competitorNumber; i++){
+            competitors.push({});
+        }
+        for(let i = 0; i < competitorRows.length; i++){
+            const children = competitorRows[i].children;
+            for(let j = 0; j < 5; j++){
+                if(children[j].children[0].value == ""){
+                    wrong.push(i);
+                    break;
                 }
-            })
-            if(!keep){
-                wrong.push(index)
+                competitors[i][children[j].children[0].name] = children[j].children[0].value;
             }
-            return keep;
+        }
+        console.log(competitors);
+        wrong.reverse()
+        wrong.forEach((element) => {
+            console.log(element);
+            competitors.splice(element, 1);
         })
+        console.log(competitors);
         const errors = document.querySelectorAll("#competitors-table .error");
         errors.forEach(el => {
             el.classList.remove("error")
