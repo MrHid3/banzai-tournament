@@ -4,6 +4,7 @@ async function getResource(resourceName) {
 }
 
 const locations = await getResource(`${backendURL}/resources/locations.json`);
+const competitors = await getResource(`${backendURL}/getCompetitors`);
 
 const locationSelect = document.querySelector('#location-select');
 const competitorsTable = document.querySelector("#competitors-table");
@@ -16,10 +17,18 @@ locations.forEach(location => {
     locationSelect.appendChild(option);
 })
 
+locationSelect.addEventListener("change", () => {
+    const locationCompetitors = competitors.filter(competitor => competitor.location = locationSelect.value);
+    console.log(locationCompetitors);
+    locationCompetitors.forEach(competitor => {
+        addCompetitor(competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
+    })
+})
+
 let competitorNumber = 0;
-function addCompetitor() {
+function addCompetitor(name="", surname="", age="", weight="", level=1) {
     competitorNumber++;
-    const inputs = [['text', 'name'], ['text', 'surname'], ['number', 'age'], ['number', 'weight']];
+    const inputs = [['text', 'name', name], ['text', 'surname', surname], ['number', 'age', age], ['number', 'weight', weight]];
     const tr = document.createElement("tr");
     tr.classList.add(`competitor-${competitorNumber}`);
     tr.classList.add("competitor");
@@ -28,6 +37,7 @@ function addCompetitor() {
         const input = document.createElement("input");
         input.type = inputs[i][0];
         input.name = inputs[i][1];
+        input.value = inputs[i][2];
         td.appendChild(input);
         tr.appendChild(td);
     }
@@ -60,7 +70,7 @@ function deleteCompetitor(e){
 }
 
 addCompetitor();
-addCompetitorButton.addEventListener("click", addCompetitor);
+addCompetitorButton.addEventListener("click", () => addCompetitor());
 
 async function send(){
     if(locationSelect.value == 0){
