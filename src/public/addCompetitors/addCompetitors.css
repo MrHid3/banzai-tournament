@@ -140,6 +140,8 @@ select {
 
 option{
     text-align: left;
+    height: 30px;
+    font-weight: bold;
 }
 
 option[disabled] {
