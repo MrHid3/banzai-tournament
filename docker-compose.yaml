@@ -1,0 +1,42 @@
+services:
+  postgresdb:
+    image: postgres
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+    ports:
+      - ${POSTGRESDB_LOCAL_PORT}:${POSTGRESDB_DOCKER_PORT}
+    volumes:
+      - db:/var/lib/postgresql/data
+  backend:
+    depends_on:
+      - postgresdb
+    restart: unless-stopped
+    build: ../banzai-tournament-BE
+    env_file:
+      - .env
+    volumes:
+      - ../banzai-tournament-BE:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    command:
+      ["sh", "src/wait-for-postgres.sh", "npm", "run", "dev"]
+  frontend:
+    depends_on:
+      - backend
+    restart: unless-stopped
+    build: ./
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - 4000:4000
+    command:
+      npm run dev
+volumes:
+  db:

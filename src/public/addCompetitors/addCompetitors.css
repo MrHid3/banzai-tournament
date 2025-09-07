@@ -51,11 +51,15 @@ button{
 }
 
 #add-competitor-button{
-    display: block;
+    display: none;
     width: calc(100% - 4px);
     background-color: var(--highlight);
     color: var(--text-active);
     margin: 5px auto;
+}
+
+.before-location{
+    justify-content: center !important;
 }
 
 #location-select{
@@ -148,12 +152,20 @@ option[disabled] {
     display: none;
 }
 
-.error > * > * {
+.error {
     background-color: rgb(255, 178, 15);
     color: var(--highlight);
     /*border-top: 1px solid var(--text-active);*/
     /*border-bottom: 1px solid var(--text-active);*/
     /*margin: 2px;*/
+}
+
+.hidden{
+    display: none !important;
+}
+
+.disabled{
+    pointer-events: none !important;
 }
 
 @media only screen and (max-width: 1100px) {
