@@ -16,23 +16,23 @@ services:
     depends_on:
       - postgresdb
     restart: unless-stopped
-    build: ../banzai-tournament-BE
+    build: backend
     env_file:
       - .env
     volumes:
-      - ../banzai-tournament-BE:/app
+      - ./backend:/app
       - /app/node_modules
     ports:
       - 3000:3000
     command:
-      ["sh", "src/wait-for-postgres.sh", "npm", "run", "dev"]
+      ["sh", "scripts/wait-for-postgres.sh", "npm", "run", "dev"]
   frontend:
     depends_on:
       - backend
     restart: unless-stopped
-    build: ./
+    build: frontend
     volumes:
-      - ./:/app
+      - ./frontend:/app
       - /app/node_modules
     ports:
       - 4000:4000

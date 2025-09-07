@@ -1,0 +1,18 @@
+{
+  "name": "banzai-tournament",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch ./src/app.js"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^17.2.1",
+    "express": "^4.21.2",
+    "morgan": "^1.10.1",
+    "pg": "^8.16.3"
+  }
+}
