@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { engine } from 'express-handlebars';
 import "dotenv/config"
 import cors from 'cors';
+import {configDotenv} from "dotenv";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

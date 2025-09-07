@@ -10,7 +10,6 @@ async function getResource(resourceName) {
         return null
     }
 }
-
 const locations = await getResource(`${backendURL}/resources/locations.json`);
 
 const locationSelect = document.querySelector('#location-select');
@@ -39,7 +38,7 @@ locationSelect.addEventListener("change", async () => {
     addCompetitorButton.style.display = "block";
     topBar.classList.remove("before-location");
     saveButton.classList.remove("hidden");
-
+    addCompetitor();
 })
 
 let changes = [];
