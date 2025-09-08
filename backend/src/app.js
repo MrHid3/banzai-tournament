@@ -1,3 +1,5 @@
+//TODO: add auth
+
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -36,25 +38,36 @@ initDB();
 
 app.post('/addCompetitors', async (req, res) => {
     let wrong = [];
-    console.log(req.body);
-    // req.body.competitors.forEach(async (competitor, index) => {
-    //     if(competitor[0] != "" && competitor[1] != "" && competitor[2] != "" && competitor[3] != "" && req.body.location != null){
-    //         await pool.query("INSERT INTO competitors (name, surname, age, weight, level, location) values ($1, $2, $3, $4, $5, $6)",
-    //             [competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level, req.body.location])
-    //     }else{
-    //         wrong.push(index)
-    //     }
-    // });
-    // if(wrong.length > 0){
-    //     res.send({
-    //         error: true,
-    //         wrong: wrong
-    //     })
-    // }
-    // res.send({
-    //     error: false,
-    //     wrong: null
-    // })
+    const {
+        location,
+        changes,
+        newCompetitors
+    } = req.body;
+    for (const competitor of newCompetitors) {
+        const {
+            id,
+            name,
+            surname,
+            age,
+            weight,
+            level
+        } = competitor;
+        await pool.query("INSERT INTO competitors (name, surname, age, weight, level, location) VALUES ($1, $2, $3, $4, $5, $6)",
+            [name, surname, age, weight, level, location]);
+    }
+    const IDs = await pool.query("SELECT id FROM competitors")
+    const IDarray = IDs.rows.map(row => row.id);
+    for(const change of changes) {
+        const{
+            id,
+            name,
+            value
+        } = change;
+        if(!["name", "surname", "age", "weight", "level"].includes(name)
+        || !IDarray.includes(id))
+            return;
+        await pool.query(`UPDATE competitors SET ${name}= $1 WHERE id = $2`, [value, id])
+    }
 })
 
 app.get('/getCompetitors', async (req, res) => {

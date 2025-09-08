@@ -38,14 +38,13 @@ locationSelect.addEventListener("change", async () => {
     addCompetitorButton.style.display = "block";
     topBar.classList.remove("before-location");
     saveButton.classList.remove("hidden");
-    addCompetitor();
 })
 
 let changes = [];
 let competitors = [];
-function addCompetitor(id=-1, name="", surname="", age="", weight="", level=0) {
+function addCompetitor(id=-1, name="", surname="", age="", weight="", level=-1) {
     const competitorNumber = competitors.length;
-    competitors.push({id: id, name:name, surname: surname, age: age, weight: weight, level: level, location: locationSelect.value})
+    competitors.push({id: id, name:name, surname: surname, age: age, weight: weight, level: level})
     const inputs = [['text', 'name', name], ['text', 'surname', surname], ['number', 'age', age], ['number', 'weight', weight]];
     const tr = document.createElement("tr");
     tr.classList.add(`competitor-${competitors.length}`);
@@ -95,7 +94,7 @@ function addCompetitor(id=-1, name="", surname="", age="", weight="", level=0) {
         levelSelect.classList.remove("error");
         changeCompetitor(id, "level", e.target.value, competitorNumber);
     })
-    levelSelect.selectedIndex = level;
+    levelSelect.value = level;
     levelTd.appendChild(levelSelect);
     tr.appendChild(levelTd);
     const deleteButtonTd = document.createElement("td");
