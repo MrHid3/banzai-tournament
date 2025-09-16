@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
 
+import locations from "./public/resources/locations.json" with {type: "json"}
 import pool from './server_scripts/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -37,36 +38,45 @@ async function initDB(){
 initDB();
 
 app.post('/addCompetitors', async (req, res) => {
-    let wrong = [];
-    const {
-        location,
-        changes,
-        newCompetitors
-    } = req.body;
-    for (const competitor of newCompetitors) {
+    try{
+        let wrong = [];
         const {
-            id,
-            name,
-            surname,
-            age,
-            weight,
-            level
-        } = competitor;
-        await pool.query("INSERT INTO competitors (name, surname, age, weight, level, location) VALUES ($1, $2, $3, $4, $5, $6)",
-            [name, surname, age, weight, level, location]);
-    }
-    const IDs = await pool.query("SELECT id FROM competitors")
-    const IDarray = IDs.rows.map(row => row.id);
-    for(const change of changes) {
-        const{
-            id,
-            name,
-            value
-        } = change;
-        if(!["name", "surname", "age", "weight", "level"].includes(name)
-        || !IDarray.includes(id))
-            return;
-        await pool.query(`UPDATE competitors SET ${name}= $1 WHERE id = $2`, [value, id])
+            location,
+            changes,
+            newCompetitors
+        } = req.body;
+        for (const competitor of newCompetitors) {
+            const {
+                id,
+                name,
+                surname,
+                age,
+                weight,
+                level
+            } = competitor;
+            await pool.query("INSERT INTO competitors (name, surname, age, weight, level, location) VALUES ($1, $2, $3, $4, $5, $6)",
+                [name, surname, age, weight, level, location]);
+        }
+        const IDs = await pool.query("SELECT id FROM competitors")
+        const IDarray = IDs.rows.map(row => row.id);
+        for(const change of changes) {
+            const{
+                id,
+                name,
+                value
+            } = change;
+            if(!["name", "surname", "age", "weight", "level", "remove"].includes(name)
+            || !IDarray.includes(id))
+                return;
+            if(name === "remove"){
+                await pool.query('DELETE FROM competitors WHERE id = $1', [id]);
+            }else{
+                await pool.query(`UPDATE competitors SET ${name}= $1 WHERE id = $2`, [value, id])
+            }
+        }
+        res.sendStatus(200);
+    }catch(error){
+        res.sendStatus(500);
     }
 })
 
@@ -76,7 +86,7 @@ app.get('/getCompetitors', async (req, res) => {
 })
 
 app.get("/getCompetitors/school/:school", async (req, res) => {
-    const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location FROM competitors WHERE location=$1", [req.params.school]);
+    const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level FROM competitors WHERE location=$1", [req.params.school]);
     res.send(getCompetitorsQuery.rows);
 })
 
