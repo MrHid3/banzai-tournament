@@ -1,7 +1,3 @@
-//TODO: deleting
-//TODO: loading twice
-//TODO: reloading after saving
-//TODO:
 async function getResource(resourceName) {
     try{
         const request = await fetch(resourceName);
@@ -30,7 +26,14 @@ try{
 }
 
 let locationCompetitors = [];
-locationSelect.addEventListener("change", async () => {
+let competitors = [];
+let changes = [];
+let firstLocationChoice = true;
+let previousLocation = "";
+
+if(localStorage.getItem("location") != null){
+    locationSelect.value = localStorage.getItem("location");
+    firstLocationChoice = false;
     locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`) ?? [];
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
@@ -38,10 +41,34 @@ locationSelect.addEventListener("change", async () => {
     addCompetitorButton.style.display = "block";
     topBar.classList.remove("before-location");
     saveButton.classList.remove("hidden");
+}
+locationSelect.addEventListener("change", async () => {
+    if(firstLocationChoice){
+        firstLocationChoice = false;
+        addCompetitorButton.style.display = "block";
+        topBar.classList.remove("before-location");
+        saveButton.classList.remove("hidden");
+    } else if(JSON.stringify([...locationCompetitors]) !== JSON.stringify([...competitors])){
+        if(!confirm("Jesteś pewny? Masz niezapisane zmiany")){
+            locationSelect.value = previousLocation;
+            return;
+        }
+    }else{
+        const competitorsTrs = document.querySelectorAll(".competitor");
+        competitorsTrs.forEach(tr => {
+            tr.remove();
+        })
+        competitors = [];
+    }
+    locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`) ?? [];
+    locationCompetitors.forEach(competitor => {
+        addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
+    })
+    previousLocation = locationSelect.value;
+    localStorage.setItem("location", locationSelect.value);
+    deactivateSave();
 })
 
-let changes = [];
-let competitors = [];
 function addCompetitor(id=-1, name="", surname="", age="", weight="", level=-1) {
     const competitorNumber = competitors.length;
     competitors.push({id: id, name:name, surname: surname, age: age, weight: weight, level: level})
@@ -105,11 +132,16 @@ function addCompetitor(id=-1, name="", surname="", age="", weight="", level=-1) 
     deleteButtonTd.appendChild(deleteButton);
     tr.appendChild(deleteButtonTd);
     competitorsTable.appendChild(tr);
+    compareCompetitors();
 }
 
 function deleteCompetitor(competitorNumber){
     competitorsTable.removeChild(competitorsTable.children[competitorNumber + 1]);
     competitors.splice(competitorNumber, 1);
+    if(competitors.id != -1){
+        changes = [{id: competitorNumber, name: "remove", value: null}]
+    }
+    compareCompetitors();
 }
 
 addCompetitorButton.addEventListener("click", () => addCompetitor());
@@ -195,6 +227,9 @@ async function save(){
                 newCompetitors: competitorsCopy,
             })
         })
+        if(res.status === 200){
+            window.location.reload();
+        }
         // if(res.error){
         //     res.wrong.forEach(el => {
         //         competitorsTable.children[el + 1].classList.add("error");
