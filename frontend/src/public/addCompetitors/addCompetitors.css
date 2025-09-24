@@ -172,6 +172,10 @@ option[disabled] {
 }
 
 @media only screen and (max-width: 1100px) {
+    #competitors-container{
+        width: auto !important;
+    }
+
     td{
         padding: 2px !important;
     }
@@ -188,7 +192,7 @@ option[disabled] {
     }
 
     #table-wrapper{
-        max-height: 240px;
+        max-height: 210px;
         scroll-snap-type: y mandatory;
     }
 
