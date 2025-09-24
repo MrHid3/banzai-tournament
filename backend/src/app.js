@@ -76,9 +76,9 @@ app.post('/addCompetitors', async (req, res) => {
                 name,
                 value
             } = change;
-            if(!["name", "surname", "age", "weight", "level", "remove"].includes(name)
-            || !IDarray.includes(id))
-                return;
+            if(!(["name", "surname", "age", "weight", "level", "remove"].includes(name)
+            && IDarray.includes(id)))
+                continue;
             if(name === "remove"){
                 await pool.query('DELETE FROM competitors WHERE id = $1', [id]);
             }else{
@@ -87,6 +87,7 @@ app.post('/addCompetitors', async (req, res) => {
         }
         res.sendStatus(200);
     }catch(error){
+        console.log(error)
         res.sendStatus(500);
     }
 })

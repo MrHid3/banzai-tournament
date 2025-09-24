@@ -12,7 +12,6 @@ const locationSelect = document.querySelector('#location-select');
 const competitorsTable = document.querySelector("#competitors-table");
 const saveButton = document.querySelector("#send-button");
 const addCompetitorButton = document.querySelector("#add-competitor-button");
-const topBar = document.querySelector("#top-bar");
 
 try{
     locations.forEach(location => {
@@ -39,27 +38,26 @@ if(localStorage.getItem("location") != null){
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
     })
     addCompetitorButton.style.display = "block";
-    topBar.classList.remove("before-location");
+    locationSelect.classList.remove("before-location");
     saveButton.classList.remove("hidden");
 }
 locationSelect.addEventListener("change", async () => {
     if(firstLocationChoice){
         firstLocationChoice = false;
         addCompetitorButton.style.display = "block";
-        topBar.classList.remove("before-location");
+        locationSelect.classList.remove("before-location");
         saveButton.classList.remove("hidden");
     } else if(JSON.stringify([...locationCompetitors]) !== JSON.stringify([...competitors])){
         if(!confirm("Jesteś pewny? Masz niezapisane zmiany")){
             locationSelect.value = previousLocation;
             return;
         }
-    }else{
-        const competitorsTrs = document.querySelectorAll(".competitor");
-        competitorsTrs.forEach(tr => {
-            tr.remove();
-        })
-        competitors = [];
     }
+    const competitorsTrs = document.querySelectorAll(".competitor");
+    competitorsTrs.forEach(tr => {
+        tr.remove();
+    })
+    competitors = [];
     locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`) ?? [];
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
@@ -137,10 +135,10 @@ function addCompetitor(id=-1, name="", surname="", age="", weight="", level=-1) 
 
 function deleteCompetitor(competitorNumber){
     competitorsTable.removeChild(competitorsTable.children[competitorNumber + 1]);
-    competitors.splice(competitorNumber, 1);
-    if(competitors.id != -1){
-        changes = [{id: competitorNumber, name: "remove", value: null}]
+    if(competitors[competitorNumber].id != -1){
+        changes = [{id: competitors[competitorNumber].id, name: "remove", value: null}]
     }
+    competitors.splice(competitorNumber, 1);
     compareCompetitors();
 }
 
@@ -229,6 +227,8 @@ async function save(){
         })
         if(res.status === 200){
             window.location.reload();
+        }else if(res.status === 500){
+            alert("Coś poszło nie tak. Spróbuj ponownie później");
         }
         // if(res.error){
         //     res.wrong.forEach(el => {

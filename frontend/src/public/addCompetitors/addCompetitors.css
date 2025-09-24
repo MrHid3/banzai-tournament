@@ -41,6 +41,7 @@ div#container{
 }
 
 #competitors-container{
+    width: 901px;
     padding: 10px;
 }
 
@@ -57,13 +58,15 @@ button{
     color: var(--text-active);
     margin: 5px auto;
 }
-
+/* move from center to left in a nice motion */
 .before-location{
-    justify-content: center !important;
+    margin: 0 auto !important;
 }
 
 #location-select{
+    animation-duration: 0.5s;
     height: 40px;
+    margin: 0;
 }
 
 #send-button{
