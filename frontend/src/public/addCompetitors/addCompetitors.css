@@ -192,7 +192,7 @@ option[disabled] {
     }
 
     #table-wrapper{
-        max-height: 210px;
+        max-height: 2101px;
         scroll-snap-type: y mandatory;
     }
 
