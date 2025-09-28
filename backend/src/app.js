@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 import locations from "./public/resources/locations.json" with {type: "json"}
 
@@ -21,6 +23,12 @@ const pool = new pg.Pool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME
 });
+
+const roles = [
+    {role: "admin", password: process.env.USER_ADMIN_PASSWORD},
+    {role: "adder", password: process.env.USER_ADD_PASSWORD},
+    {role: "referee", password: process.env.USER_TOURNAMENT_PASSWORD},
+]
 
 const app = express();
 
@@ -47,6 +55,18 @@ async function initDB(){
 }
 
 initDB();
+
+app.post('/login', async (req, res) => {
+    const { role, password } = req.body;
+    const user = roles.find(r => r.role === role);
+
+    if (!role || !(password == role.password)) {
+        return res.status(401).send('Invalid credentials');
+    }
+
+    const token = jwt.sign({ userId: user.username }, secretKey, { expiresIn: '1h'});
+    res.status(200).send({ token })
+});
 
 app.post('/addCompetitors', async (req, res) => {
     try{

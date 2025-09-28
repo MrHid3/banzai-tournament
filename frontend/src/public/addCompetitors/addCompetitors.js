@@ -43,7 +43,6 @@ if(localStorage.getItem("location") != null){
     saveButton.classList.remove("hidden");
 }
 locationSelect.addEventListener("change", async () => {
-    console.log(locationCompetitors, competitors)
     if(firstLocationChoice){
         firstLocationChoice = false;
         addCompetitorButton.style.display = "block";
@@ -143,8 +142,6 @@ function deleteCompetitor(competitorNumber){
     }
     competitors[competitorNumber].exists = false;
     compareCompetitors();
-    console.log(changes)
-    console.log(competitors[competitorNumber].id)
 }
 
 addCompetitorButton.addEventListener("click", () => addCompetitor());
@@ -160,7 +157,7 @@ function activateSave(){
 }
 
 function compareCompetitors(){
-    if(JSON.stringify(locationCompetitors) === JSON.stringify(competitors)){
+    if(JSON.stringify(locationCompetitors) === JSON.stringify(competitors) || !competitors.some(c => c.exists)){
         deactivateSave();
     }else{
         activateSave();

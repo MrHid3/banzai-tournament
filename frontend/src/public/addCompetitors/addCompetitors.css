@@ -57,7 +57,9 @@ button{
     background-color: var(--highlight);
     color: var(--text-active);
     margin: 5px auto;
+    transition-duration: 0.5s;
 }
+
 /* move from center to left in a nice motion */
 .before-location{
     margin: 0 auto !important;

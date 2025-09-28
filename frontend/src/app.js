@@ -4,7 +4,9 @@ import { fileURLToPath } from 'url';
 import { engine } from 'express-handlebars';
 import "dotenv/config"
 import cors from 'cors';
-import {configDotenv} from "dotenv";
+import dotenv from "dotenv";
+
+dotenv.config("../")
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +23,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', cors(), (req, res) => {
     res.sendFile(path.join(__dirname, 'public/pages/index.html'));
+})
+
+app.get('/login', cors(), (req, res) => {
+    res.render('login', {backendURL: process.env.BACKEND_URL});
 })
 
 app.get('/dodawanie', cors(), (req, res) => {
