@@ -36,12 +36,14 @@ if(localStorage.getItem("location") != null){
     locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`) ?? [];
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
+        competitor.exists = true;
     })
     addCompetitorButton.style.display = "block";
     locationSelect.classList.remove("before-location");
     saveButton.classList.remove("hidden");
 }
 locationSelect.addEventListener("change", async () => {
+    console.log(locationCompetitors, competitors)
     if(firstLocationChoice){
         firstLocationChoice = false;
         addCompetitorButton.style.display = "block";
@@ -61,6 +63,7 @@ locationSelect.addEventListener("change", async () => {
     locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`) ?? [];
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
+        competitor.exists = true;
     })
     previousLocation = locationSelect.value;
     localStorage.setItem("location", locationSelect.value);
@@ -69,7 +72,7 @@ locationSelect.addEventListener("change", async () => {
 
 function addCompetitor(id=-1, name="", surname="", age="", weight="", level=-1) {
     const competitorNumber = competitors.length;
-    competitors.push({id: id, name:name, surname: surname, age: age, weight: weight, level: level})
+    competitors.push({id: id, name:name, surname: surname, age: age, weight: weight, level: level, exists: true})
     const inputs = [['text', 'name', name], ['text', 'surname', surname], ['number', 'age', age], ['number', 'weight', weight]];
     const tr = document.createElement("tr");
     tr.classList.add(`competitor-${competitors.length}`);
@@ -134,12 +137,14 @@ function addCompetitor(id=-1, name="", surname="", age="", weight="", level=-1) 
 }
 
 function deleteCompetitor(competitorNumber){
-    competitorsTable.removeChild(competitorsTable.children[competitorNumber + 1]);
+    competitorsTable.children[competitorNumber + 1].classList.add("hidden");
     if(competitors[competitorNumber].id != -1){
-        changes = [{id: competitors[competitorNumber].id, name: "remove", value: null}]
+        changes = [{id: competitors[competitorNumber].id, name: "remove", value: null}, ...changes]
     }
-    competitors.splice(competitorNumber, 1);
+    competitors[competitorNumber].exists = false;
     compareCompetitors();
+    console.log(changes)
+    console.log(competitors[competitorNumber].id)
 }
 
 addCompetitorButton.addEventListener("click", () => addCompetitor());

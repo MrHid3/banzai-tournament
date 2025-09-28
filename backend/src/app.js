@@ -63,10 +63,13 @@ app.post('/addCompetitors', async (req, res) => {
                 surname,
                 age,
                 weight,
-                level
+                level,
+                exists
             } = competitor;
-            await pool.query("INSERT INTO competitors (name, surname, age, weight, level, location) VALUES ($1, $2, $3, $4, $5, $6)",
-                [name, surname, age, weight, level, location]);
+            if(exists){
+                await pool.query("INSERT INTO competitors (name, surname, age, weight, level, location) VALUES ($1, $2, $3, $4, $5, $6)",
+                    [name, surname, age, weight, level, location]);
+            }
         }
         const IDs = await pool.query("SELECT id FROM competitors")
         const IDarray = IDs.rows.map(row => row.id);
