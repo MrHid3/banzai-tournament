@@ -59,13 +59,20 @@ initDB();
 app.post('/login', async (req, res) => {
     const { role, password } = req.body;
     const user = roles.find(r => r.role === role);
-
-    if (!role || !(password == role.password)) {
-        return res.status(401).send('Invalid credentials');
+    if (!user || !(password == user.password)) {
+        return res.status(401).send({
+            error: true,
+            errorType: "InvalidCredentials",
+            token: null
+        });
     }
-
+    const secretKey = process.env.TOKEN_SECRET;
     const token = jwt.sign({ userId: user.username }, secretKey, { expiresIn: '1h'});
-    res.status(200).send({ token })
+    res.status(200).send({
+        error: false,
+        errorType: null,
+        token: token
+    })
 });
 
 app.post('/addCompetitors', async (req, res) => {
@@ -110,7 +117,6 @@ app.post('/addCompetitors', async (req, res) => {
         }
         res.sendStatus(200);
     }catch(error){
-        console.log(error)
         res.sendStatus(500);
     }
 })
