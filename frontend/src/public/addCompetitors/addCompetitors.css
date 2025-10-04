@@ -58,6 +58,7 @@ button{
     color: var(--text-active);
     margin: 5px auto;
     transition-duration: 0.5s;
+    border-radius: 0 0 5px 5px;
 }
 
 /* move from center to left in a nice motion */
@@ -69,11 +70,13 @@ button{
     animation-duration: 0.5s;
     height: 40px;
     margin: 0;
+    border-radius: 5px 0 0 0;
 }
 
 #send-button{
     background-color: var(--highlight);
     color: var(--text-active);
+    border-radius: 0 5px 0 0;
 }
 
 .delete-button{

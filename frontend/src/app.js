@@ -11,28 +11,28 @@ dotenv.config("../")
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
+const App = express();
 
-app.engine('handlebars', engine());
-app.set('view engine', 'handlebars');
-app.set('views', path.join(__dirname, 'views'));
+App.engine('handlebars', engine());
+App.set('view engine', 'handlebars');
+App.set('views', path.join(__dirname, 'views'));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+App.use(express.json());
+App.use(express.urlencoded({ extended: true }));
+App.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', cors(), (req, res) => {
+App.get('/', cors(), (req, res) => {
     res.sendFile(path.join(__dirname, 'public/pages/index.html'));
 })
 
-app.get('/login', cors(), (req, res) => {
-    res.render('login', {backendURL: process.env.BACKEND_URL});
+App.get('/login', cors(), (req, res) => {
+    res.render('login', {backendURL: process.env.BACKEND_URL, login: true});
 })
 
-app.get('/dodawanie', cors(), (req, res) => {
+App.get('/dodawanie', cors(), (req, res) => {
     res.render("addCompetitors", {backendURL: process.env.BACKEND_URL});
 })
 
-app.listen(4000, () => {
+App.listen(4000, () => {
     console.log('http://localhost:4000')
 });

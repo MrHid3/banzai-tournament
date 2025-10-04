@@ -12,7 +12,7 @@ until nc -z "${DB_HOST}" "${POSTGRESDB_DOCKER_PORT}"; do
     count=0
   fi
 done
-
+sleep 5
 echo "Postgres is up - executing command"
 
 exec "$@"

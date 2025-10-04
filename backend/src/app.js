@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import pg from 'pg';
 import dotenv from 'dotenv';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import locations from "./public/resources/locations.json" with {type: "json"}
@@ -15,6 +14,7 @@ dotenv.config("../");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const secretKey = process.env.TOKEN_SECRET;
 
 const pool = new pg.Pool({
     host: process.env.DB_HOST,
@@ -30,7 +30,7 @@ const roles = [
     {role: "referee", password: process.env.USER_TOURNAMENT_PASSWORD},
 ]
 
-const app = express();
+const App = express();
 
 const corsOptions ={
     origin:'*',
@@ -38,10 +38,10 @@ const corsOptions ={
     optionSuccessStatus:200,
 }
 
-app.use(cors(corsOptions))
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+App.use(cors(corsOptions))
+App.use(express.json());
+App.use(express.urlencoded({ extended: true }));
+App.use(express.static(path.join(__dirname, 'public')));
 
 async function initDB(){
     await pool.query("CREATE table IF NOT EXISTS competitors(" +
@@ -54,9 +54,21 @@ async function initDB(){
         "location varchar)")
 }
 
-initDB();
+await initDB();
 
-app.post('/login', async (req, res) => {
+function authenticateToken(req, res, next){
+    const token = req.body.token || req.query.token;
+    if(!token)
+        return res.sendStatus(401)
+
+    jwt.verify(token, secretKey, (err, role) => {
+        if (err) return res.sendStatus(403);
+        req.role = role;
+        next();
+    })
+}
+
+App.post('/login', async(req, res) => {
     const { role, password } = req.body;
     const user = roles.find(r => r.role === role);
     if (!user || !(password == user.password)) {
@@ -66,8 +78,7 @@ app.post('/login', async (req, res) => {
             token: null
         });
     }
-    const secretKey = process.env.TOKEN_SECRET;
-    const token = jwt.sign({ userId: user.username }, secretKey, { expiresIn: '1h'});
+    const token = jwt.sign({ userId: user.username }, secretKey, { expiresIn: '168h'});
     res.status(200).send({
         error: false,
         errorType: null,
@@ -75,7 +86,11 @@ app.post('/login', async (req, res) => {
     })
 });
 
-app.post('/addCompetitors', async (req, res) => {
+App.post('/verify', authenticateToken, async(req, res) => {
+   res.sendStatus(200);
+})
+
+App.post('/addCompetitors', authenticateToken, async (req, res) => {
     try{
         let wrong = [];
         const {
@@ -121,16 +136,16 @@ app.post('/addCompetitors', async (req, res) => {
     }
 })
 
-app.get('/getCompetitors', async (req, res) => {
+App.get('/getCompetitors', async (req, res) => {
     const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location FROM competitors");
     res.send(getCompetitorsQuery.rows);
 })
 
-app.get("/getCompetitors/school/:school", async (req, res) => {
+App.get("/getCompetitors/school/:school", authenticateToken, async (req, res) => {
     const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level FROM competitors WHERE location=$1", [req.params.school]);
     res.send(getCompetitorsQuery.rows);
 })
 
-app.listen(3000, () => {
+App.listen(3000, () => {
     console.log('http://localhost:3000')
 });

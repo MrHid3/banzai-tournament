@@ -1,6 +1,6 @@
-async function getResource(resourceName) {
+async function getResource(resourceName, token=null) {
     try{
-        const request = await fetch(resourceName);
+        const request = await fetch(resourceName + (token? `/?token=${token}` : ''));
         return await request.json();
     }catch(err){
         return null
@@ -12,6 +12,7 @@ const locationSelect = document.querySelector('#location-select');
 const competitorsTable = document.querySelector("#competitors-table");
 const saveButton = document.querySelector("#send-button");
 const addCompetitorButton = document.querySelector("#add-competitor-button");
+const token = localStorage.getItem('token');
 
 try{
     locations.forEach(location => {
@@ -33,7 +34,7 @@ let previousLocation = "";
 if(localStorage.getItem("location") != null){
     locationSelect.value = localStorage.getItem("location");
     firstLocationChoice = false;
-    locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`) ?? [];
+    locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`, token) ?? [];
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
         competitor.exists = true;
@@ -59,7 +60,7 @@ locationSelect.addEventListener("change", async () => {
         tr.remove();
     })
     competitors = [];
-    locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`) ?? [];
+    locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`, token) ?? [];
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
         competitor.exists = true;
@@ -178,7 +179,6 @@ async function save(){
         alert("Wybierz lokalizację");
         return;
     }
-    //TODO: verify all rows are completed
     let invalidInputs = [];
     const competitorInputs = document.querySelectorAll(".competitor td input");
     for (let i = 0; i < competitorInputs.length; i++){
@@ -204,10 +204,8 @@ async function save(){
         return
     }
     if(confirm("Na pewno?")){
-        //TODO: send competitors to server
         let competitorsCopy = competitors.slice();
         competitorsCopy.splice(0, locationCompetitors.length);
-        //TODO: only keep the latest changes
         for(let i = 0; i < changes.length; i++){
             for(let j = i + 1; j < changes.length; j++){
                 if(changes[i]["id"] === changes[j]["id"]
@@ -225,6 +223,7 @@ async function save(){
                 location: locationSelect.value,
                 changes: changes,
                 newCompetitors: competitorsCopy,
+                token: token
             })
         })
         if(res.status === 200){
