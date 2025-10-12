@@ -22,11 +22,15 @@ App.use(express.urlencoded({ extended: true }));
 App.use(express.static(path.join(__dirname, 'public')));
 
 App.get('/', cors(), (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages/index.html'));
+    res.redirect("/menu");
 })
 
 App.get('/login', cors(), (req, res) => {
     res.render('login', {backendURL: process.env.BACKEND_URL, login: true});
+})
+
+App.get('/menu', cors(), (req, res) => {
+    res.render('menu', {backendURL: process.env.BACKEND_URL, menu: true});
 })
 
 App.get('/dodawanie', cors(), (req, res) => {

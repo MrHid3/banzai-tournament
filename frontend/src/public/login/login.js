@@ -22,6 +22,7 @@ loginForm.addEventListener('submit', async (e) => {
         alert(alertMessage)
     }else{
         localStorage.setItem('token', consumed.token)
-        window.location = "/main"
+        localStorage.setItem('role', roleSelect.value)
+        window.location = "/menu"
     }
 })

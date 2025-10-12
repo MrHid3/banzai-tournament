@@ -7,24 +7,31 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="/main/main.css">
     <style>
-        {{#if main}}
+        {{#if menu}}
             #logout {
                 border-radius: 5px;
             }
         {{else}}
              #logout {
-                border-radius: 0 5px 5px 0;
+                border-radius: 0 0 5px 0;
             }
+             #logout::before{
+                 content: "";
+                 height: 100%;
+                 background-color: var(--text-active);
+                 padding: 1px;
+                 margin: 0 10px;
+             }
         {{/if}}
     </style>
 </head>
 <body>
 {{#unless login}}
     <div id="main-header">
-        {{#unless main}}
-        <a href="/main" id="goBack"><</a>
+        {{#unless menu}}
+        <a href="/menu" id="goBack">Powrót</a>
         {{/unless}}
-        <div id="logout">Wyloguj się</div>
+        <button id="logout">Wyloguj się</button>
     </div>
 {{/unless}}
     {{{body}}}
@@ -49,6 +56,13 @@
             window.location.href = '/login';
         }}
     verify();
+    {{#unless login}}
+        const logout = document.querySelector('#logout');
+        logout.addEventListener('click', () => {
+            localStorage.setItem('token', '');
+            window.location.href = '/login';
+        })
+    {{/unless}}
 </script>
 {{/unless}}
 </html>
