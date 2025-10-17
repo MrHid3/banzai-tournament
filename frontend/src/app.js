@@ -37,6 +37,10 @@ App.get('/dodawanie', cors(), (req, res) => {
     res.render("addCompetitors", {backendURL: process.env.BACKEND_URL});
 })
 
+App.get('/zegar', cors(), (req, res) => {
+    res.render("zegar", {backendURL: process.env.BACKEND_URL});
+})
+
 App.listen(4000, () => {
     console.log('http://localhost:4000')
 });
