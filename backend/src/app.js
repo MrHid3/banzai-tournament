@@ -51,7 +51,18 @@ async function initDB(){
         "age integer," +
         "weight integer," +
         "level integer," +
-        "location varchar)")
+        "location varchar," +
+        "category_id integer)")
+    await pool.query("CREATE table IF NOT EXISTS categories(" +
+        "id serial," +
+        "level integer)")
+    await pool.query("CREATE table IF NOT EXISTS fightResults(" +
+        "category_id integer," +
+        "winner_id integer," +
+        "winner_points integer," +
+        "loser_id integer," +
+        "loser_points integer," +
+        "reason varchar)")
 }
 
 await initDB();
@@ -64,6 +75,8 @@ function authenticateToken(req, res, next){
     jwt.verify(token, secretKey, (err, role) => {
         if (err) return res.sendStatus(403);
         req.role = role;
+        delete req.body.token;
+        delete req.query.token;
         next();
     })
 }
@@ -126,6 +139,7 @@ App.post('/addCompetitors', authenticateToken, async (req, res) => {
                 continue;
             if(name === "remove"){
                 await pool.query('DELETE FROM competitors WHERE id = $1', [id]);
+                await pool.query("DELETE FROM categories_competitors WHERE id = $1", [id]);
             }else{
                 await pool.query(`UPDATE competitors SET ${name}= $1 WHERE id = $2`, [value, id])
             }
@@ -136,14 +150,66 @@ App.post('/addCompetitors', authenticateToken, async (req, res) => {
     }
 })
 
-App.get('/getCompetitors', async (req, res) => {
+App.get('/getCompetitors', authenticateToken, async (req, res) => {
     const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location FROM competitors");
     res.send(getCompetitorsQuery.rows);
+})
+
+App.get("/getCompetitor/:id", authenticateToken, async (req, res) => {
+    const getCompetitorQuery = await pool.query("SELECT id, name, surname, location, category_id FROM competitors WHERE id = $1", [req.params.id]);
+    res.send(getCompetitorQuery.rows);
 })
 
 App.get("/getCompetitors/school/:school", authenticateToken, async (req, res) => {
     const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level FROM competitors WHERE location=$1", [req.params.school]);
     res.send(getCompetitorsQuery.rows);
+})
+
+App.get("/getCategories", authenticateToken, async (req, res) => {
+    const getCategoriesQuery = await pool.query("SELECT id, name, surname, age, weight, level, category_id FROM competitors WHERE category_id IS NOT NULL");
+    const getCategoryNumbers = await pool.query("SELECT DISTINCT category_id FROM competitors WHERE category_id IS NOT NULL ORDER BY category_id ASC");
+    res.send({kategorie: getCategoryNumbers.rows, zawodnicy: getCategoriesQuery.rows});
+})
+
+App.get("/getCompetitorsWithoutCategories", authenticateToken, async (req, res) => {
+    const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, category_id FROM competitors WHERE category_id IS NULL");
+    res.send(getCompetitorsQuery.rows);
+})
+
+App.post("/saveCategories", authenticateToken, async(req, res) => {
+    await pool.query("UPDATE competitors SET category_id = NULL");
+    req.body.categories.forEach(async (category) => {
+        await pool.query("UPDATE competitors SET category_id = $1 WHERE id = ANY($2::int[])", [category.kategoria, category.zawodnicy])
+    })
+    res.send(200)
+})
+
+App.post("/saveFightResults", authenticateToken, async (req, res) => {
+    const {
+        winner_ID,
+        winner_points,
+        loser_ID,
+        loser_points,
+        category_ID,
+        reason
+    } = req.body;
+    if(winner_ID && winner_points && loser_ID && loser_points && category_ID && reason){
+        await pool.query("INSERT INTO fightResults (category_id, winner_id, winner_points, loser_id, loser_points, reason) " +
+            "VALUES ($1, $2, $3, $4, $5, $6)", [category_ID, winner_ID, winner_points, loser_ID, loser_points, reason])
+        res.send(200)
+    }else{
+        res.send(400)
+    }
+})
+
+App.get("/getFightResults", async (req, res) => {
+    const fightResultsQuery = await pool.query("SELECT * FROM fightResults");
+    res.send(fightResultsQuery.rows);
+})
+
+App.get("/getFightResults/:id", async(req, res) => {
+   const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE winner_id = $1 UNION SELECT * FROM fightResults WHERE loser_id = $1", [req.params.id]);
+   res.send(fightResultsQuery.rows);
 })
 
 App.listen(3000, () => {

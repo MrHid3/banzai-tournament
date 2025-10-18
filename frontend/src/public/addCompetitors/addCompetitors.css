@@ -74,6 +74,7 @@ button{
     background-color: var(--highlight);
     color: var(--text-active);
     border-radius: 0 5px 0 0;
+    width: 150px;
 }
 
 .delete-button{
@@ -93,6 +94,10 @@ button{
     overflow-y: scroll;
     max-height: 605px;
     /*max-height: 200px;*/
+}
+
+#table-wrapper::-webkit-scrollbar {
+    display: none;
 }
 
 table{

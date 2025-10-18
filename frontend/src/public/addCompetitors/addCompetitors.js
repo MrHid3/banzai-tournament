@@ -158,7 +158,7 @@ function activateSave(){
 }
 
 function compareCompetitors(){
-    if(JSON.stringify(locationCompetitors) === JSON.stringify(competitors) || !competitors.some(c => c.exists)){
+    if(JSON.stringify(locationCompetitors) === JSON.stringify(competitors.filter(c => c.exists)) || !competitors.some(c => c.exists)){
         deactivateSave();
     }else{
         activateSave();
@@ -180,14 +180,14 @@ async function save(){
         return;
     }
     let invalidInputs = [];
-    const competitorInputs = document.querySelectorAll(".competitor td input");
+    const competitorInputs = document.querySelectorAll(".competitor:not(.hidden) td input");
     for (let i = 0; i < competitorInputs.length; i++){
         if(competitorInputs[i].value === ""){
             invalidInputs.push(i);
         }
     }
     let invalidSelects = [];
-    const levelSelects = document.querySelectorAll(".level");
+    const levelSelects = document.querySelectorAll(".competitor:not(.hidden) .level");
     for(let i = 0; i < levelSelects.length; i++){
         if(levelSelects[i].value === "-1"){
             invalidSelects.push(i);

@@ -37,8 +37,12 @@ App.get('/dodawanie', cors(), (req, res) => {
     res.render("addCompetitors", {backendURL: process.env.BACKEND_URL});
 })
 
+App.get("/kategorie", cors(), (req, res) => {
+    res.render('categories', {backendURL: process.env.BACKEND_URL});
+})
+
 App.get('/zegar', cors(), (req, res) => {
-    res.render("zegar", {backendURL: process.env.BACKEND_URL});
+    res.render("clock", {backendURL: process.env.BACKEND_URL});
 })
 
 App.listen(4000, () => {
