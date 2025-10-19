@@ -1,5 +1,5 @@
 //przykład ciągnięcia zawodnika
-const id = 2
+const id = 15
 fetch(`${backendURL}/getCompetitor/${id}?token=${token}`)
 
 //ciągniesz zawodników z bazy
