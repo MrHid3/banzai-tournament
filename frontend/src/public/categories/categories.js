@@ -453,3 +453,4 @@ function sprawdzBezKategorii() {
 }
 
 podzialNaGrupy();
+sprawdzBezKategorii()

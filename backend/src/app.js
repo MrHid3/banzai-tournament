@@ -144,7 +144,6 @@ App.post('/addCompetitors', authenticateToken, async (req, res) => {
                 continue;
             if(name === "remove"){
                 await pool.query('DELETE FROM competitors WHERE id = $1', [id]);
-                await pool.query("DELETE FROM categories_competitors WHERE id = $1", [id]);
             }else{
                 await pool.query(`UPDATE competitors SET ${name}= $1 WHERE id = $2`, [value, id])
             }
@@ -205,7 +204,7 @@ App.get("/getCategories", authenticateToken, async (req, res) => {
     *]
     * */
     try{
-        const categoriesQuery = await pool.query("SELECT DISTINCT(ca.id), ca.level FROM categories ca RIGHT JOIN competitors co ON co.category_id = ca.id")
+        const categoriesQuery = await pool.query("SELECT DISTINCT(ca.id), ca.level FROM categories ca RIGHT JOIN competitors co ON co.category_id = ca.id WHERE ca.ID IS NOT NULL")
         let result = [];
         let index = 0;
         for (const category of categoriesQuery.rows) {

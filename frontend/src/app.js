@@ -45,6 +45,10 @@ App.get('/zegar', cors(), (req, res) => {
     res.render("clock", {backendURL: process.env.BACKEND_URL, clock: true});
 })
 
+App.get("/test", cors(), (req, res) => {
+    res.render("test", {backendURL: process.env.BACKEND_URL});
+})
+
 App.listen(4000, () => {
     console.log('Frontend is up at http://localhost:4000')
 });

@@ -1,5 +1,5 @@
 const rolesAccess = {
-    "admin": ["adding", "clock", "categories"],
+    "admin": ["adding", "clock", "categories", "test"],
     "adder": ["adding"],
     "referee": ["clock"]
 }

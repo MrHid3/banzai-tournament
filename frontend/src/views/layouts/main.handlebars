@@ -29,13 +29,15 @@
     </style>
 </head>
 <body>
-{{#unless login or clock}}
+{{#unless login}}
+    {{#unless clock}}
     <div id="main-header">
         {{#unless menu}}
         <a href="/menu" id="goBack">Powrót</a>
         {{/unless}}
         <button id="logout">Wyloguj się</button>
     </div>
+    {{/unless}}
 {{/unless}}
 {{#unless login}}
 <script>
