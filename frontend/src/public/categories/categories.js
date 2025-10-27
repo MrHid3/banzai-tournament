@@ -3,14 +3,33 @@ let aktualniePrzeciągany = null;
 
 //****************************************************Kategorie********************************************************//
 
-function KategoriaWagowa(waga){
-    return Math.floor(waga / 3.5) * 3.5;
+function KategoriaWagowa(waga1, waga2){
+    const diff = Math.abs(waga1 - waga2);
+    const bigger = waga1 > waga2 ? waga2 : waga1;
+    return diff/bigger * 100 <= 10;
 }
 
 fetch(`${backendURL}/getCompetitors?token=${token}`)
     .then(response => response.json())
     .then(data => {
-        zawodnicy = data;
+        zawodnicy = data.sort((a,b) => {
+            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+            const surnameA = a.surname.toUpperCase();
+            const surnameB = b.surname.toUpperCase();
+            if (surnameA > surnameB) {
+                return 1;
+            }
+            if (surnameA > surnameB) {
+                return 1;
+            }
+            return 0;});
         const tbody = document.getElementById('zawodnicy').querySelector('tbody');
 
         data.forEach(zawodnik => {
@@ -40,10 +59,10 @@ async function podzialNaGrupy(){
         const res = await fetch(`${backendURL}/getCategories?token=${token}`);
         const existing = await res.json();
         if (Array.isArray(existing) && existing.length > 0) {
-            wyswietlGrupy(existing.map((g, i) => g.zawodnicy));
+            wyswietlGrupy(existing.map((g, i) => g));
             document.getElementById('zapisz').classList.remove('hidden');
 
-            const resBez = await fetch('/getCompetitorsWithoutCategories');
+            const resBez = await fetch(`${backendURL}/getCompetitorsWithoutCategories?token=${token}`);
             const bezKat = await resBez.json();
             if (bezKat.length > 0) {
                 wyswietlZawodnikowBezKategorii(bezKat);
@@ -58,10 +77,9 @@ async function podzialNaGrupy(){
 
             nieprzydzieleni.sort((a, b) =>
                 String(a.level).localeCompare(String(b.level)) ||
-                KategoriaWagowa(a.weight) - KategoriaWagowa(b.weight) ||
+                KategoriaWagowa(a.weight, b.weight) ||
                 a.age - b.age
             );
-
             while(nieprzydzieleni.length > 0) {
                 const pierwszy = nieprzydzieleni.shift();
                 const grupa = [pierwszy];
@@ -71,7 +89,7 @@ async function podzialNaGrupy(){
                 for (const kandydat of nieprzydzieleni) {
                     if (grupa.length < 4 &&
                         kandydat.level === pierwszy.level &&
-                        KategoriaWagowa(kandydat.weight) === KategoriaWagowa(pierwszy.weight) &&
+                        KategoriaWagowa(kandydat.weight, pierwszy.weight) &&
                         kandydat.age - minAge <= 2
                     ) {
                         grupa.push(kandydat);
@@ -98,7 +116,6 @@ async function podzialNaGrupy(){
 function wyswietlGrupy(listaGrup){
     const divGrupy = document.getElementById('grupy');
     divGrupy.innerHTML = "";
-
     listaGrup = listaGrup
         .map(g => Array.isArray(g) ? g : g.zawodnicy || [])
         .filter(grupa => grupa.length > 0);
@@ -111,7 +128,6 @@ function wyswietlGrupy(listaGrup){
         blokGrupy.innerHTML = `<h3>Kategoria ${numerGrupy+1}</h3>`;
 
         addDragDropListener(blokGrupy);
-
 
         grupaZawodnikow.forEach((zawodnik) =>{
             const zawodnikDiv = document.createElement('div');
@@ -375,6 +391,7 @@ document.getElementById('zapisz').addEventListener('click', async () => {
 
         if(response.ok) {
             alert("Grupy zostały zapisane w bazie!");
+            window.location.reload();
         }else{
             alert("Błąd podczas zapisywania grup.");
         }
@@ -387,13 +404,9 @@ document.getElementById('zapisz').addEventListener('click', async () => {
 //****************************************************wyswietlZawodnikowBezKategorii********************************************************//
 
 function wyswietlZawodnikowBezKategorii(bezKat) {
-    let staryDiv = document.querySelector('.bez-kategorii');
-    if(staryDiv) staryDiv.remove();
-
     if(bezKat.length === 0) return;
 
-    const divBezKat = document.createElement('div');
-    divBezKat.classList.add('grupa', 'bez-kategorii');
+    const divBezKat = document.querySelector('div.bez-kategorii');
 
     const h3 = document.createElement('h3');
     h3.textContent = 'Zawodnicy bez kategorii';
@@ -425,9 +438,6 @@ function wyswietlZawodnikowBezKategorii(bezKat) {
     });
 
     addDragDropListener(divBezKat);
-
-    const tabela = document.getElementById('zawodnicy');
-    tabela.parentNode.insertBefore(divBezKat, tabela);
 }
 
 //****************************************************sprawdzBezKategorii********************************************************//

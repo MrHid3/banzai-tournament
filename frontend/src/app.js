@@ -42,9 +42,9 @@ App.get("/kategorie", cors(), (req, res) => {
 })
 
 App.get('/zegar', cors(), (req, res) => {
-    res.render("clock", {backendURL: process.env.BACKEND_URL});
+    res.render("clock", {backendURL: process.env.BACKEND_URL, clock: true});
 })
 
 App.listen(4000, () => {
-    console.log('http://localhost:4000')
+    console.log('Frontend is up at http://localhost:4000')
 });

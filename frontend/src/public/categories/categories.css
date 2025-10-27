@@ -189,9 +189,14 @@ main{
     padding-right: 30px; /* miejsce na X */
 }
 
-#zapisz {
+#buttonsDiv{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#zapisz{
     background-color: var(--highlight);
-    margin: 0 auto;
     display: block;
     padding: 5px;
     border: 2px solid black;
@@ -220,16 +225,17 @@ main{
 
 .grupa.bez-kategorii {
     border: 1px dashed #ccc;
+    color: var(--text-active);
     padding: 10px;
     margin-bottom: 10px;
-    background-color: #f9f9f9;
+    background-color: var(--bg-primary);
 }
 
 .grupa.bez-kategorii .zawodnik {
     cursor: grab;
     margin: 5px 0;
     padding: 5px;
-    background-color: #fff;
+    background-color: var(--bg-secondary);
     border: 1px solid #ddd;
     border-radius: 4px;
 }
