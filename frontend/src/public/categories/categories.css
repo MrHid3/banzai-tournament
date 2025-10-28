@@ -194,20 +194,42 @@ main{
     justify-content: center;
 }
 
-#zapisz{
+#buttonsDiv > *{
     background-color: var(--highlight);
     display: block;
-    padding: 5px;
-    border: 2px solid black;
-    border-radius: 0 0 10px 10px;
+    padding: 5px 10px;
+    border-width: 2px 0;
+    /*border: 2px solid black;*/
+    border-color: black;
+    border-style: solid;
     color: var(--text-active);
     font-weight: bold;
-    width: 100px;
+    font-size: 14px;
+    width: fit-content;
+}
+
+#buttonsDiv *{
     cursor: pointer;
 }
 
-#zapisz:hover {
+#buttonsDiv > *:first-child{
+    border-radius: 0 0 0 10px;
+    border-width: 2px 0 2px 2px;
+}
+
+#buttonsDiv > *:last-child{
+    border-radius: 0 0 10px;
+    border-width: 2px 2px 2px 0;
+}
+
+#buttonsDiv > *:hover {
     background-color: #cc000099;
+}
+
+input[type=checkbox] {
+    vertical-align: center;
+    position: relative;
+    top: 1px;
 }
 
 .info-bez-kat {

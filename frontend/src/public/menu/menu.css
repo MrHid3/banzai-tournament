@@ -6,10 +6,7 @@
 
 
 #menu-container{
-    position: absolute;
-    top: 25%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin: 10% auto 0 auto;
     background-color: rgba(0, 0, 0, 0.3);
     padding: 15px 10px;
     border-radius: 10px;
