@@ -1,5 +1,43 @@
 let zawodnicy = [];
 let aktualniePrzeciągany = null;
+let canEdit = true;
+
+const showTable = document.querySelector('#showTable');
+const showCategories = document.querySelector("#showCategories");
+const edition = document.querySelector("#edition");
+const categories = document.querySelector("#grupy");
+const table = document.querySelector("#zawodnicy-container");
+showTable.addEventListener('input', (e) => {
+    if(e.target.checked) {
+       table.style.display = "block";
+    }else{
+        table.style.display = "none";
+    }
+})
+
+showCategories.addEventListener('input', (e) => {
+    if(e.target.checked) {
+        categories.style.display = "block";
+        table.style.width = "50%";
+    }else{
+        categories.style.display = "none";
+        table.style.width = "100%";
+    }
+})
+
+edition.addEventListener('input', (e) => {
+    const pluses = document.querySelectorAll(".plus")
+    if(e.target.checked) {
+        for(let i = 0; i < pluses.length; i++) {
+            pluses[i].style.display = "block";
+        }
+    }else{
+        for(let i = 0; i < pluses.length; i++) {
+            pluses[i].style.display = "none";
+        }
+    }
+    canEdit = e.target.checked;
+})
 
 //****************************************************Kategorie********************************************************//
 
@@ -90,7 +128,7 @@ async function podzialNaGrupy(){
                     if (grupa.length < 4 &&
                         kandydat.level === pierwszy.level &&
                         KategoriaWagowa(kandydat.weight, pierwszy.weight) &&
-                        kandydat.age - minAge <= 2
+                        Math.abs(kandydat.age - minAge) <= 2
                     ) {
                         grupa.push(kandydat);
                     } else {
@@ -163,6 +201,7 @@ function wyswietlGrupy(listaGrup){
 //****************************************************getDragAfterElement********************************************************//
 
 function getDragAfterElement(container, y) {
+    if(!canEdit) return;
     const draggableElements = [...container.querySelectorAll('.zawodnik:not(.dragging)')];
     return draggableElements.reduce((closest, child) => {
         const box = child.getBoundingClientRect();
@@ -217,6 +256,7 @@ function odswiezNumeracje(){
 
 function addDragDropListener(grupa) {
     grupa.addEventListener('dragover', event => {
+        if(!canEdit) return;
         event.preventDefault();
 
         let placeholder = grupa.querySelector('.placeholder');
@@ -235,6 +275,7 @@ function addDragDropListener(grupa) {
     });
 
     grupa.addEventListener('dragleave', event => {
+        if(!canEdit) return;
         const related = event.relatedTarget;
         if(!grupa.contains(related)){
             grupa.querySelectorAll('.placeholder').forEach(p => p.remove());
@@ -242,6 +283,7 @@ function addDragDropListener(grupa) {
     })
 
     grupa.addEventListener('drop', event => {
+        if(!canEdit) return;
         event.preventDefault();
         const zawodnik = aktualniePrzeciągany;
         if(!zawodnik) return

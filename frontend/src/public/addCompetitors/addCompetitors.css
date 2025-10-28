@@ -38,8 +38,9 @@ div#container{
 }
 
 #competitors-container{
-    width: 901px;
+    width: fit-content;
     padding: 10px;
+    min-width: 950px;
 }
 
 button{

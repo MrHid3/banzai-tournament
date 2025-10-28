@@ -158,7 +158,7 @@ function activateSave(){
 }
 
 function compareCompetitors(){
-    if(JSON.stringify(locationCompetitors) === JSON.stringify(competitors.filter(c => c.exists)) || !competitors.some(c => c.exists)){
+    if(JSON.stringify(locationCompetitors) === JSON.stringify(competitors.filter(c => c.exists))){
         deactivateSave();
     }else{
         activateSave();

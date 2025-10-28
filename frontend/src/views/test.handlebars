@@ -14,7 +14,7 @@
                 surname: letter,
                 age: Math.floor(Math.random() * 10) + 8,
                 weight: Math.floor(Math.random() * 50) + 20,
-                level: Math.floor(Math.random() * 2),
+                level: Math.floor(Math.random() * 2) + 1,
                 exists: true
             }
             await fetch(`${backendURL}/addCompetitors`, {
