@@ -79,7 +79,7 @@ fetch(`${backendURL}/getCompetitors?token=${token}`)
                 <td>${zawodnik.surname}</td>
                 <td>${zawodnik.age}</td>
                 <td>${waga}</td>
-                <td>${zawodnik.level}</td>
+                <td>${zawodnik.level + 1}</td>
                 <td>${zawodnik.location}</td>
                 `;
 
@@ -462,7 +462,7 @@ function wyswietlZawodnikowBezKategorii(bezKat) {
         zawodnikDiv.textContent = `${zawodnik.name} ${zawodnik.surname}, 
             ${zawodnik.age} lat, 
             ${Math.round(zawodnik.weight * 10) / 10} kg, 
-            poziom ${zawodnik.level}, ${zawodnik.location}
+            poziom ${zawodnik.level + 1}, ${zawodnik.location}
             `;
 
         zawodnikDiv.addEventListener('dragstart', event => {

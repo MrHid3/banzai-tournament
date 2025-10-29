@@ -73,27 +73,51 @@ function authenticateToken(req, res, next){
     if(!token)
         return res.sendStatus(401)
 
-    jwt.verify(token, secretKey, (err, role) => {
+    jwt.verify(token, secretKey, (err, decoded) => {
         if (err) return res.sendStatus(403);
-        req.role = role;
+        req.role = decoded.role;
         delete req.body.token;
         delete req.query.token;
-        next();
+        next()
     })
+}
+
+function authenticateAdder(req, res, next){
+    if(req.role === "adder" || req.role === "admin"){
+        next();
+    }else{
+        res.sendStatus(401)
+    }
+}
+
+function authenticateReferee(req, res, next){
+    if(req.role === "referee" || req.role === "admin"){
+        next();
+    }else{
+        res.sendStatus(401);
+    }
+}
+
+function authenticateAdmin(req, res, next){
+    if(req.role === "admin"){
+        next();
+    }else{
+        res.sendStatus(401)
+    }
 }
 
 App.post('/login', async(req, res) => {
     try{
         const { role, password } = req.body;
         const user = roles.find(r => r.role === role);
-        if (!user || !(password == user.password)) {
+        if (!user || !(password === user.password)) {
             return res.status(401).send({
                 error: true,
                 errorType: "InvalidCredentials",
                 token: null
             });
         }
-        const token = jwt.sign({ userId: user.username }, secretKey, { expiresIn: '168h'});
+        const token = jwt.sign({ role: user.role }, secretKey, { expiresIn: '168h'});
         res.status(200).send({
             error: false,
             errorType: null,
@@ -108,7 +132,7 @@ App.post('/verify', authenticateToken, async(req, res) => {
    res.sendStatus(200);
 })
 
-App.post('/addCompetitors', authenticateToken, async (req, res) => {
+App.post('/addCompetitors', authenticateToken, authenticateAdder, async (req, res) => {
     try{
         let wrong = [];
         const {
@@ -183,7 +207,7 @@ App.get("/getCompetitors/school/:school", authenticateToken, async (req, res) =>
     }
 })
 
-App.get("/getCategories", authenticateToken, async (req, res) => {
+App.get("/getCategories", authenticateToken, authenticateAdmin, async (req, res) => {
     /*
     * [
     *   {
@@ -222,7 +246,7 @@ App.get("/getCategories", authenticateToken, async (req, res) => {
     }
 })
 
-App.get("/getCompetitorsWithoutCategories", authenticateToken, async (req, res) => {
+App.get("/getCompetitorsWithoutCategories", authenticateToken, authenticateAdmin, async (req, res) => {
     try {
         const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location FROM competitors WHERE category_id IS NULL");
         res.send(getCompetitorsQuery.rows);
@@ -232,7 +256,7 @@ App.get("/getCompetitorsWithoutCategories", authenticateToken, async (req, res) 
     }
 })
 
-App.post("/saveCategories", authenticateToken, async(req, res) => {
+App.post("/saveCategories", authenticateToken, authenticateAdmin, async(req, res) => {
     try{
         await pool.query("UPDATE competitors SET category_id = NULL")
         await pool.query("DELETE FROM categories");
@@ -248,7 +272,7 @@ App.post("/saveCategories", authenticateToken, async(req, res) => {
     }
 })
 
-App.post("/saveFightResults", authenticateToken, async (req, res) => {
+App.post("/saveFightResults", authenticateToken, authenticateReferee, async (req, res) => {
     try{
         const {
             winner_ID,
