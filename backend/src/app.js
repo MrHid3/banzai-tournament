@@ -69,7 +69,7 @@ async function initDB(){
 await initDB();
 
 function authenticateToken(req, res, next){
-    let token = req.body.token || req.query.token;
+    const token = req.body.token || req.query.token;
     if(!token)
         return res.sendStatus(401)
 
