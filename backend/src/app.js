@@ -99,8 +99,6 @@ function authenticateReferee(req, res, next){
 }
 
 function authenticateAdmin(req, res, next){
-    console.log(req.role);
-    console.log(req.role === "admin")
     if(req.role === "admin"){
         next();
     }else{
@@ -120,7 +118,6 @@ App.post('/login', async(req, res) => {
             });
         }
         const token = jwt.sign({ role: user.role }, secretKey, { expiresIn: '168h'});
-        console.log(token)
         res.status(200).send({
             error: false,
             errorType: null,
