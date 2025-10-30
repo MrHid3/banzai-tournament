@@ -1,5 +1,3 @@
-//TODO: add auth
-
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -61,8 +59,10 @@ async function initDB(){
         "category_id integer references categories(id)," +
         "winner_id integer references competitors(id)," +
         "winner_points integer," +
+        "winner_small_points integer," +
         "loser_id integer references competitors(id)," +
         "loser_points integer," +
+        "loser_small_points integer" +
         "reason varchar)")
 }
 
@@ -277,14 +277,16 @@ App.post("/saveFightResults", authenticateToken, authenticateReferee, async (req
         const {
             winner_ID,
             winner_points,
+            winner_small_points,
             loser_ID,
             loser_points,
+            loser_small_points,
             category_ID,
             reason
         } = req.body;
         if(winner_ID && winner_points && loser_ID && loser_points && category_ID && reason){
-            await pool.query("INSERT INTO fightResults (category_id, winner_id, winner_points, loser_id, loser_points, reason) " +
-                "VALUES ($1, $2, $3, $4, $5, $6)", [category_ID, winner_ID, winner_points, loser_ID, loser_points, reason])
+            await pool.query("INSERT INTO fightResults (category_id, winner_id, winner_points, winner_small_points, loser_id, loser_points, loser_small_points, reason) " +
+                "VALUES ($1, $2, $3, $4, $5, $6)", [category_ID, winner_ID, winner_points, winner_small_points, loser_ID, loser_points, loser_small_points, reason])
             res.sendStatus(200)
         }else{
             res.sendStatus(400)
