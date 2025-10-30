@@ -12,6 +12,7 @@ const locationSelect = document.querySelector('#location-select');
 const competitorsTable = document.querySelector("#competitors-table");
 const saveButton = document.querySelector("#send-button");
 const addCompetitorButton = document.querySelector("#add-competitor-button");
+const searchCompetitorInput = document.querySelector("#search-competitor-input");
 const token = localStorage.getItem('token');
 
 try{
@@ -35,6 +36,7 @@ if(localStorage.getItem("location") != null){
     locationSelect.value = localStorage.getItem("location");
     firstLocationChoice = false;
     locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`, token) ?? [];
+    locationCompetitors.reverse()
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
         competitor.exists = true;
@@ -43,6 +45,7 @@ if(localStorage.getItem("location") != null){
     locationSelect.classList.remove("before-location");
     saveButton.classList.remove("hidden");
 }
+
 locationSelect.addEventListener("change", async () => {
     if(firstLocationChoice){
         firstLocationChoice = false;
@@ -231,11 +234,16 @@ async function save(){
         }else if(res.status === 500){
             alert("Coś poszło nie tak. Spróbuj ponownie później");
         }
-        // if(res.error){
-        //     res.wrong.forEach(el => {
-        //         competitorsTable.children[el + 1].classList.add("error");
-        //     })
-        // }
     }
 }
 saveButton.addEventListener("click", save);
+
+function searchCompetitor(text){
+   const competitorInputs = Array.from(document.querySelectorAll(".competitor:not(.hidden) td input[type=text]"));
+   const regex = new RegExp(".*" + text.toLowerCase() + ".*");
+   const matching = (competitorInputs.find(input => regex.test(input.value.toLowerCase())));
+   matching.scrollIntoView({behavior: "smooth", block: "center"});
+   matching.parentNode.parentNode.classList.add("filet");
+   setTimeout( () => matching.classList.remove("filet"), 1000)
+}
+searchCompetitorInput.addEventListener("change", (e) => searchCompetitor(e.target.value));

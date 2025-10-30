@@ -8,12 +8,14 @@
         for(let i = 0; i < 10; i++) {
             const letterIndex = Math.floor(Math.random() * 26);
             const letter = String.fromCharCode(lowercaseAsciiStart + letterIndex);
+            const age = Math.floor(Math.random() * 10) + 8;
+            console.log((140 + (age - 8) * (Math.floor(Math.random() * 2) + 1))/100)
             const competitor = {
                 id: -1,
                 name: letter,
                 surname: letter,
-                age: Math.floor(Math.random() * 10) + 8,
-                weight: Math.floor(Math.random() * 50) + 20,
+                age: age,
+                weight: Math.pow((140 + (age - 8) * (Math.floor(Math.random() * 5) + 1))/100, 2) * ((Math.floor(Math.random() * 10) + 16)),
                 level: Math.floor(Math.random() * 2) + 1,
                 exists: true
             }

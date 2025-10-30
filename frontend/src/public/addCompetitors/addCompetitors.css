@@ -17,7 +17,6 @@ body{
 #top-bar{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     padding: 5px 12px;
     position: sticky;
     top: 0;
@@ -28,6 +27,13 @@ body{
 
 #top-bar *{
     padding: 5px;
+    height: 40px;
+}
+
+#search-competitor-input{
+    width: 100%;
+    text-align: start;
+    margin: 0 5px;
 }
 
 div#container{
@@ -93,12 +99,19 @@ button{
 
 #table-wrapper{
     overflow-y: scroll;
-    max-height: 605px;
+    max-height: 70vh;
     /*max-height: 200px;*/
 }
 
 #table-wrapper::-webkit-scrollbar {
-    display: none;
+    /*display: none;*/
+    background-color: transparent;
+    width: 5PX;
+}
+
+#table-wrapper::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 10px;
 }
 
 table{
@@ -254,4 +267,20 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
     -moz-appearance: textfield;
+}
+
+@keyframes filet{
+    0%{
+        background-color: rgba(255, 0, 0, 1)
+    }
+    50%{
+        background-color: rgba(255, 0, 0, 1)
+    }
+    100%{
+       background-color: initial
+    }
+}
+
+.filet{
+    animation: filet 2s linear;
 }
