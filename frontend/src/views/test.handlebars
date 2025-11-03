@@ -1,7 +1,10 @@
 <button id="dodaj">dodaj 10 zawodników</button>
+<button id="clear">wyczyść baze</button>
 <script>
     const backendURL = "{{{backendURL}}}";
     const dodajButton = document.getElementById("dodaj");
+    const clearButton = document.getElementById("clear");
+
     dodajButton.addEventListener("click", async () => {
 
         const lowercaseAsciiStart = 97;
@@ -9,7 +12,6 @@
             const letterIndex = Math.floor(Math.random() * 26);
             const letter = String.fromCharCode(lowercaseAsciiStart + letterIndex);
             const age = Math.floor(Math.random() * 10) + 8;
-            console.log((140 + (age - 8) * (Math.floor(Math.random() * 2) + 1))/100)
             const competitor = {
                 id: -1,
                 name: letter,
@@ -33,4 +35,16 @@
             })
         }
     });
+
+    clearButton.addEventListener("click", () => {
+        fetch(`${backendURL}/clearBase`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: token
+            })
+        })
+    })
 </script>

@@ -42,7 +42,6 @@ App.use(express.urlencoded({ extended: true }));
 App.use(express.static(path.join(__dirname, 'public')));
 
 async function initDB(){
-    // await pool.query("DROP TABLE IF EXISTS fightResults; DROP TABLE IF EXISTS competitors; DROP TABLE IF EXISTS categories")
     await pool.query("CREATE TABLE IF NOT EXISTS categories(" +
         "id integer primary key," +
         "level integer)")
@@ -62,7 +61,7 @@ async function initDB(){
         "winner_small_points integer," +
         "loser_id integer references competitors(id)," +
         "loser_points integer," +
-        "loser_small_points integer" +
+        "loser_small_points integer," +
         "reason varchar)")
 }
 
@@ -305,6 +304,11 @@ App.get("/getFightResults", authenticateToken, async (req, res) => {
 App.get("/getFightResults/:id", authenticateToken, async (req, res) => {
    const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE winner_id = $1 UNION SELECT * FROM fightResults WHERE loser_id = $1", [req.params.id]);
    res.send(fightResultsQuery.rows);
+})
+
+App.post("/clearBase", authenticateToken, authenticateAdmin, async (req, res) => {
+    await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE")
+    res.sendStatus(200);
 })
 
 App.listen(3000, () => {
