@@ -139,6 +139,7 @@ async function podzialNaGrupy(){
                 nieprzydzieleni = pozostali;
                 grupy.push(grupa);
             }
+            grupy.sort((a, b) => a[0].age  - b[0].age);
             wyswietlGrupy(grupy)
             document.getElementById('zapisz').classList.remove('hidden');
         }
@@ -418,7 +419,6 @@ document.getElementById('zapisz').addEventListener('click', async () => {
         alert("Brak zawodników do zapisania!");
         return;
     }
-
     try {
         const response = await fetch(`${backendURL}/saveCategories`, {
             method: 'POST',
@@ -433,7 +433,7 @@ document.getElementById('zapisz').addEventListener('click', async () => {
 
         if(response.ok) {
             alert("Grupy zostały zapisane w bazie!");
-            window.location.reload();
+            // window.location.reload();
         }else{
             alert("Błąd podczas zapisywania grup.");
         }

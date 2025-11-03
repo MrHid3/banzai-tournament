@@ -1,8 +1,10 @@
 <button id="dodaj">dodaj 10 zawodników</button>
 <button id="clear">wyczyść baze</button>
+<button id="dodaj100">dodaj 100 zawodników</button>
 <script>
     const backendURL = "{{{backendURL}}}";
     const dodajButton = document.getElementById("dodaj");
+    dodaj100 = document.getElementById("dodaj100");
     const clearButton = document.getElementById("clear");
 
     dodajButton.addEventListener("click", async () => {
@@ -36,6 +38,36 @@
         }
     });
 
+    dodaj100.addEventListener("click", async () => {
+
+        const lowercaseAsciiStart = 97;
+        for(let i = 0; i < 100; i++) {
+            const letterIndex = Math.floor(Math.random() * 26);
+            const letter = String.fromCharCode(lowercaseAsciiStart + letterIndex);
+            const age = Math.floor(Math.random() * 10) + 8;
+            const competitor = {
+                id: -1,
+                name: letter,
+                surname: letter,
+                age: age,
+                weight: Math.pow((140 + (age - 8) * (Math.floor(Math.random() * 5) + 1))/100, 2) * ((Math.floor(Math.random() * 10) + 16)),
+                level: Math.floor(Math.random() * 2) + 1,
+                exists: true
+            }
+            await fetch(`${backendURL}/addCompetitors`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    location: 'SPnr1',
+                    changes: [],
+                    newCompetitors: [competitor],
+                    token: token
+                })
+            })
+        }
+    });
     clearButton.addEventListener("click", () => {
         fetch(`${backendURL}/clearBase`, {
             method: 'POST',
