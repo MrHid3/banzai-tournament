@@ -42,7 +42,7 @@ App.use(express.urlencoded({ extended: true }));
 App.use(express.static(path.join(__dirname, 'public')));
 
 async function initDB(){
-    // await pool.query("DROP TABLE IF EXISTS fightResults; DROP TABLE IF EXISTS competitors; DROP TABLE IF EXISTS categories")
+    // await pool.query("DROP TABLE IF EXISTS fightResults; DROP TABLE IF EXISTS competitors; DROP TABLE IF EXISTS categories");
     await pool.query("CREATE TABLE IF NOT EXISTS categories(" +
         "id integer primary key," +
         "level integer)")
@@ -59,10 +59,8 @@ async function initDB(){
         "category_id integer references categories(id)," +
         "winner_id integer references competitors(id)," +
         "winner_points integer," +
-        "winner_small_points integer," +
         "loser_id integer references competitors(id)," +
         "loser_points integer," +
-        "loser_small_points integer" +
         "reason varchar)")
 }
 
@@ -228,7 +226,7 @@ App.get("/getCategories", authenticateToken, authenticateAdmin, async (req, res)
     *]
     * */
     try{
-        const categoriesQuery = await pool.query("SELECT DISTINCT(ca.id), ca.level FROM categories ca RIGHT JOIN competitors co ON co.category_id = ca.id WHERE ca.ID IS NOT NULL")
+        const categoriesQuery = await pool.query("SELECT DISTINCT(ca.id), ca.level FROM categories ca RIGHT JOIN competitors co ON co.category_id = ca.id WHERE ca.ID IS NOT NULL ORDER BY ca.id ASC")
         let result = [];
         let index = 0;
         for (const category of categoriesQuery.rows) {
@@ -277,16 +275,14 @@ App.post("/saveFightResults", authenticateToken, authenticateReferee, async (req
         const {
             winner_ID,
             winner_points,
-            winner_small_points,
             loser_ID,
             loser_points,
-            loser_small_points,
             category_ID,
             reason
         } = req.body;
         if(winner_ID && winner_points && loser_ID && loser_points && category_ID && reason){
-            await pool.query("INSERT INTO fightResults (category_id, winner_id, winner_points, winner_small_points, loser_id, loser_points, loser_small_points, reason) " +
-                "VALUES ($1, $2, $3, $4, $5, $6)", [category_ID, winner_ID, winner_points, winner_small_points, loser_ID, loser_points, loser_small_points, reason])
+            await pool.query("INSERT INTO fightResults (category_id, winner_id, winner_points, loser_id, loser_points, reason) " +
+                "VALUES ($1, $2, $3, $4, $5, $6)", [category_ID, winner_ID, winner_points, loser_ID, loser_points, reason])
             res.sendStatus(200)
         }else{
             res.sendStatus(400)
@@ -305,6 +301,11 @@ App.get("/getFightResults", authenticateToken, async (req, res) => {
 App.get("/getFightResults/:id", authenticateToken, async (req, res) => {
    const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE winner_id = $1 UNION SELECT * FROM fightResults WHERE loser_id = $1", [req.params.id]);
    res.send(fightResultsQuery.rows);
+})
+
+App.post("/clearBase", authenticateToken, authenticateAdmin, async (req, res) => {
+    await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE")
+    res.sendStatus(200);
 })
 
 App.listen(3000, () => {
