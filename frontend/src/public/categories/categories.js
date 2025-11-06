@@ -85,6 +85,7 @@ fetch(`${backendURL}/getCompetitors?token=${token}`)
 
             tbody.appendChild(tr);
         });
+        podzialNaGrupy();
     })
     .catch(eror => console.error(eror));
 
@@ -109,7 +110,6 @@ async function podzialNaGrupy(){
                 if(staryDiv) staryDiv.remove()
             }
         } else {
-
             let nieprzydzieleni = [...zawodnicy];
             let grupy = [];
 
@@ -139,8 +139,9 @@ async function podzialNaGrupy(){
                 nieprzydzieleni = pozostali;
                 grupy.push(grupa);
             }
-            wyswietlGrupy(grupy)
             document.getElementById('zapisz').classList.remove('hidden');
+            wyswietlGrupy(grupy)
+            sprawdzBezKategorii()
         }
 
     } catch (err) {
@@ -452,6 +453,7 @@ function wyswietlZawodnikowBezKategorii(bezKat) {
 
     const h3 = document.createElement('h3');
     h3.textContent = 'Zawodnicy bez kategorii';
+    divBezKat.style.display = "block";
     divBezKat.appendChild(h3);
 
     bezKat.forEach(zawodnik => {
@@ -489,10 +491,7 @@ function sprawdzBezKategorii() {
     if(bezKat) {
         const zawodnicy = bezKat.querySelectorAll('.zawodnik');
         if(zawodnicy.length === 0) {
-            bezKat.remove();
+            bezKat.style.display = "none";
         }
     }
 }
-
-podzialNaGrupy();
-sprawdzBezKategorii()
