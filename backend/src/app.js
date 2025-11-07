@@ -5,6 +5,8 @@ import cors from 'cors';
 import pg from 'pg';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+import { createServer } from "node:http"
+import { Server  } from "socket.io";
 
 import locations from "./public/resources/locations.json" with {type: "json"}
 
@@ -29,8 +31,15 @@ const roles = [
 ]
 
 const App = express();
+const server = createServer(App);
+const io = new Server(server, {
+    cors: {
+        origin: [process.env.FRONTEND_URL]
+    }
+});
 
 const corsOptions ={
+
     origin:'*',
     credentials:true,
     optionSuccessStatus:200,
@@ -308,6 +317,10 @@ App.post("/clearBase", authenticateToken, authenticateAdmin, async (req, res) =>
     res.sendStatus(200);
 })
 
-App.listen(3000, () => {
+io.on("connection", socket => {
+    console.log("aaaa")
+})
+
+server.listen(3000, () => {
     console.log('Backend is up at http://localhost:3000')
 });

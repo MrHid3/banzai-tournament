@@ -45,6 +45,10 @@ App.get('/zegar', cors(), (req, res) => {
     res.render("clock", {backendURL: process.env.BACKEND_URL, clock: true});
 })
 
+App.get("/stolikGlowny", cors(), (req, res) => {
+    res.render("mainTable", {backendURL: process.env.BACKEND_URL})
+})
+
 App.get("/test", cors(), (req, res) => {
     res.render("test", {backendURL: process.env.BACKEND_URL});
 })
