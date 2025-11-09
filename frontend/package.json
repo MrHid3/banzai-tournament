@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev_windows": "nodemon -L --watch src --ext js,json src/app.js",
-    "dev_linux": "nodemon -L --watch src --ext js,json src/app.js"
+    "dev_linux": "node --watch src/app.js"
   },
   "private": true,
   "dependencies": {

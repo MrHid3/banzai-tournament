@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev_windows": "nodemon -L --watch src --ext js,json src/app.js",
-    "dev_linux": "nodemon -L --watch src --ext js,json src/app.js"
+    "dev_linux": "node --watch src/app.js"
   },
   "dependencies": {
     "body-parser": "^2.2.0",
