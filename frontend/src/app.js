@@ -54,5 +54,5 @@ App.get("/test", cors(), (req, res) => {
 })
 
 App.listen(4000, () => {
-    console.log('Frontend is up at http://localhost:4000')
+    console.log(`Frontend is up at ${process.env.FRONTEND_URL}`);
 });

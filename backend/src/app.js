@@ -318,9 +318,31 @@ App.post("/clearBase", authenticateToken, authenticateAdmin, async (req, res) =>
 })
 
 io.on("connection", socket => {
-    console.log("aaaa")
+    socket.emit("award", {category: 1, competitors: [
+            {
+                name: "bob",
+                surname: "odenkirk",
+                school: "spnr1",
+                place: 1
+            }, {
+                name: "walter",
+                surname: "whities",
+                school: "spnr2",
+                place: 2
+            }, {
+                name: "kim",
+                surname: "sexler",
+                school: "spnr3",
+                place: 3
+            }, {
+                name: "jesse",
+                surname: "gayman",
+                school: "spnr4",
+                place: 4
+            }
+        ]})
 })
 
 server.listen(3000, () => {
-    console.log('Backend is up at http://localhost:3000')
+    console.log(`Backend is up at ${process.env.BACKEND_URL}`);
 });

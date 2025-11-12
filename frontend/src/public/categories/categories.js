@@ -179,7 +179,7 @@ function wyswietlGrupy(listaGrup){
                         ${zawodnik.name} ${zawodnik.surname}, 
                         ${zawodnik.age} lat, 
                         ${Math.round(zawodnik.weight * 10) / 10} kg, 
-                        poziom ${zawodnik.level}, 
+                        poziom ${zawodnik.level + 1}, 
                         ${zawodnik.location}
                     `;
 
@@ -435,7 +435,7 @@ document.getElementById('zapisz').addEventListener('click', async () => {
 
         if(response.ok) {
             alert("Grupy zostały zapisane w bazie!");
-            // window.location.reload();
+            window.location.reload();
         }else{
             alert("Błąd podczas zapisywania grup.");
         }
