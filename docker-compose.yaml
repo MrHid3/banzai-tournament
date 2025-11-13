@@ -1,7 +1,7 @@
 services:
   postgresdb:
     image: postgres
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./.env
     environment:
@@ -15,7 +15,7 @@ services:
   backend:
     depends_on:
       - postgresdb
-    restart: unless-stopped
+    restart: always
     build: backend
     env_file:
       - .env
@@ -29,7 +29,7 @@ services:
   frontend:
     depends_on:
       - backend
-    restart: unless-stopped
+    restart: always
     build: frontend
     env_file:
       - .env
