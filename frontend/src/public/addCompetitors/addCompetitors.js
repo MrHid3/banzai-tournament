@@ -13,6 +13,9 @@ const competitorsTable = document.querySelector("#competitors-table");
 const saveButton = document.querySelector("#send-button");
 const addCompetitorButton = document.querySelector("#add-competitor-button");
 const searchCompetitorInput = document.querySelector("#search-competitor-input");
+const goBackButton = document.querySelector("#goBack");
+const logoutButton = document.querySelector("#logout");
+const resetButton = document.querySelector("#reset-button");
 const token = localStorage.getItem('token');
 
 try{
@@ -40,11 +43,38 @@ if(localStorage.getItem("location") != null){
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
         competitor.exists = true;
+        delete competitor.category_id;
     })
     addCompetitorButton.style.display = "block";
     locationSelect.classList.remove("before-location");
     saveButton.classList.remove("hidden");
+    searchCompetitorInput.classList.remove("hidden");
+    resetButton.classList.remove("hidden");
 }
+
+goBackButton.addEventListener("click", (e) => {
+    if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
+        if(!confirm("Jesteś pewny? Masz niezapisane zmiany")){
+            e.preventDefault()
+        }
+    }
+})
+
+logoutButton.addEventListener("click", (e) => {
+    if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
+        if(!confirm("Jesteś pewny? Masz niezapisane zmiany")){
+            e.preventDefault()
+        }
+    }
+})
+
+resetButton.addEventListener("click", (e) => {
+    if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
+        if(confirm("Jesteś pewny? Niezapisane zmiany zostaną utracone")){
+           window.location.reload();
+        }
+    }
+})
 
 locationSelect.addEventListener("change", async () => {
     if(firstLocationChoice){
@@ -52,7 +82,9 @@ locationSelect.addEventListener("change", async () => {
         addCompetitorButton.style.display = "block";
         locationSelect.classList.remove("before-location");
         saveButton.classList.remove("hidden");
-    } else if(JSON.stringify([...locationCompetitors]) !== JSON.stringify([...competitors])){
+    } else if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
+        console.log(competitors);
+        console.log(locationCompetitors);
         if(!confirm("Jesteś pewny? Masz niezapisane zmiany")){
             locationSelect.value = previousLocation;
             return;
@@ -67,6 +99,7 @@ locationSelect.addEventListener("change", async () => {
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
         competitor.exists = true;
+        delete competitor.category_id;
     })
     previousLocation = locationSelect.value;
     localStorage.setItem("location", locationSelect.value);
@@ -153,11 +186,13 @@ addCompetitorButton.addEventListener("click", () => addCompetitor());
 function deactivateSave(){
     saveButton.classList.add("disabled");
     saveButton.innerText = "BRAK ZMIAN";
+    resetButton.classList.add("hidden");
 }
 
 function activateSave(){
     saveButton.classList.remove("disabled");
     saveButton.innerText = "ZAPISZ";
+    resetButton.classList.remove("hidden");
 }
 
 function compareCompetitors(){

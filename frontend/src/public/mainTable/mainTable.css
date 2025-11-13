@@ -1,0 +1,49 @@
+@import url("../colors.css");
+
+#main{
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+    margin: 30px auto 0 auto;
+    height: 80vh;
+}
+
+#main > *{
+    width: 50%;
+    background-color: var(--bg-secondary);
+}
+
+h1{
+    width: 100%;
+    text-align: center;
+    color: var(--text-active);
+    border-color: var(--text-inactive);
+    border-style: solid;
+    height: 5%;
+    padding: 5px;
+    vertical-align: center;
+}
+
+#callContainer h1{
+    border-width: 2px 0 2px 2px;
+    border-radius: 10px 0 0 0;
+}
+
+#awardsContainer h1{
+    border-width: 2px 2px 2px 0;
+    border-radius: 0 10px 0 0;
+}
+
+#call, #awards{
+    height: 95% ;
+    border-style: solid;
+    border-color: var(--text-inactive);
+}
+
+#call{
+    border-width: 0 1px 0 0;
+}
+
+#awards{
+    border-width: 0 0 0 1px;
+}

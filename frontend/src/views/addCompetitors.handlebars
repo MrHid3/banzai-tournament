@@ -1,6 +1,6 @@
 <head>
     <meta charset="UTF-8">
-    <title>Dodawanie</title>
+    <title>Dodawanie Zawodników</title>
     <link rel="stylesheet" href="/addCompetitors/addCompetitors.css">
 </head>
 <body>
@@ -9,7 +9,8 @@
         <select name="location" id="location-select" class="before-location">
             <option value="0" disabled selected>Wybierz lokalizację</option>
         </select>
-        <input type="text" id="search-competitor-input" placeholder="Szukaj">
+        <input type="text" id="search-competitor-input" placeholder="Szukaj" class="hidden">
+        <button id="reset-button" class="hidden">RESETUJ</button>
         <button id="send-button" class="hidden">BRAK ZMIAN</button>
     </div>
     <div id="competitors-container">
@@ -37,8 +38,5 @@
         <button id="add-competitor-button">+</button>
     </div>
 </div>
-<script>
-    const backendURL = "{{{backendURL}}}";
-</script>
 <script src="addCompetitors/addCompetitors.js" type="module"></script>
 </body>

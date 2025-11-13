@@ -25,7 +25,7 @@ services:
     ports:
       - 3000:3000
     command:
-      ["sh", "scripts/wait-for-postgres.sh", "npm", "run", "dev"]
+      ["sh", "scripts/wait-for-postgres.sh", "npm", "run", "${NPM_COMMAND}"]
   frontend:
     depends_on:
       - backend
@@ -39,6 +39,6 @@ services:
     ports:
       - 4000:4000
     command:
-      npm run dev
+      ["npm", "run", "${NPM_COMMAND}"]
 volumes:
   db:

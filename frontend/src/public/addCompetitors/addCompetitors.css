@@ -77,6 +77,13 @@ button{
     border-radius: 5px 0 0 0;
 }
 
+#reset-button{
+    background-color: var(--highlight);
+    color: var(--text-active);
+    width: 150px;
+    margin-right: 5px;
+}
+
 #send-button{
     background-color: var(--highlight);
     color: var(--text-active);

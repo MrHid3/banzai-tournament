@@ -85,6 +85,7 @@ fetch(`${backendURL}/getCompetitors?token=${token}`)
 
             tbody.appendChild(tr);
         });
+        podzialNaGrupy();
     })
     .catch(eror => console.error(eror));
 
@@ -98,8 +99,15 @@ async function podzialNaGrupy(){
         const existing = await res.json();
         if (Array.isArray(existing) && existing.length > 0) {
             wyswietlGrupy(existing.map((g, i) => g));
+            let counter = 0;
+            const h3 = document.querySelectorAll("h3").forEach(e => {
+                const i = document.createElement("i");
+                i.textContent = `${existing[counter].half} połowa`
+                e.parentNode.insertBefore(i, e.nextSibling);
+                // e.innerHTML = `<i>${existing[counter].half} połowa</i>`
+                counter++;
+            })
             document.getElementById('zapisz').classList.remove('hidden');
-
             const resBez = await fetch(`${backendURL}/getCompetitorsWithoutCategories?token=${token}`);
             const bezKat = await resBez.json();
             if (bezKat.length > 0) {
@@ -109,7 +117,6 @@ async function podzialNaGrupy(){
                 if(staryDiv) staryDiv.remove()
             }
         } else {
-
             let nieprzydzieleni = [...zawodnicy];
             let grupy = [];
 
@@ -139,8 +146,11 @@ async function podzialNaGrupy(){
                 nieprzydzieleni = pozostali;
                 grupy.push(grupa);
             }
+            grupy.sort((a, b) => a[0].age  - b[0].age);
             wyswietlGrupy(grupy)
             document.getElementById('zapisz').classList.remove('hidden');
+            wyswietlGrupy(grupy)
+            sprawdzBezKategorii()
         }
 
     } catch (err) {
@@ -157,12 +167,10 @@ function wyswietlGrupy(listaGrup){
     listaGrup = listaGrup
         .map(g => Array.isArray(g) ? g : g.zawodnicy || [])
         .filter(grupa => grupa.length > 0);
-
     listaGrup.forEach((grupaZawodnikow, numerGrupy) => {
         const blokGrupy = document.createElement('div');
         blokGrupy.classList.add('grupa');
         blokGrupy.dataset.katId = numerGrupy + 1;
-
         blokGrupy.innerHTML = `<h3>Kategoria ${numerGrupy+1}</h3>`;
 
         addDragDropListener(blokGrupy);
@@ -176,7 +184,7 @@ function wyswietlGrupy(listaGrup){
                         ${zawodnik.name} ${zawodnik.surname}, 
                         ${zawodnik.age} lat, 
                         ${Math.round(zawodnik.weight * 10) / 10} kg, 
-                        poziom ${zawodnik.level}, 
+                        poziom ${zawodnik.level + 1}, 
                         ${zawodnik.location}
                     `;
 
@@ -418,7 +426,6 @@ document.getElementById('zapisz').addEventListener('click', async () => {
         alert("Brak zawodników do zapisania!");
         return;
     }
-
     try {
         const response = await fetch(`${backendURL}/saveCategories`, {
             method: 'POST',
@@ -452,6 +459,7 @@ function wyswietlZawodnikowBezKategorii(bezKat) {
 
     const h3 = document.createElement('h3');
     h3.textContent = 'Zawodnicy bez kategorii';
+    divBezKat.style.display = "block";
     divBezKat.appendChild(h3);
 
     bezKat.forEach(zawodnik => {
@@ -489,10 +497,7 @@ function sprawdzBezKategorii() {
     if(bezKat) {
         const zawodnicy = bezKat.querySelectorAll('.zawodnik');
         if(zawodnicy.length === 0) {
-            bezKat.remove();
+            bezKat.style.display = "none";
         }
     }
 }
-
-podzialNaGrupy();
-sprawdzBezKategorii()

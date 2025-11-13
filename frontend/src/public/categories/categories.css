@@ -96,6 +96,12 @@ div.zawodnik{
     padding: 3px 0;
 }
 
+i{
+    padding: 5px;
+    /*display: block;*/
+    float: right;
+}
+
 main{
     display: flex;
     flex-direction: row;
@@ -183,9 +189,9 @@ main{
     cursor: pointer;
 }
 
-.grupa h3 .tyt-grupy {
+.grupa h3 {
     display: inline-block;
-    padding-right: 30px; /* miejsce na X */
+    padding: 10px 0;
 }
 
 #buttonsDiv{
@@ -247,7 +253,7 @@ input[type=checkbox] {
 .grupa.bez-kategorii {
     border: 1px dashed #ccc;
     color: var(--text-active);
-    /*padding: 10px;*/
+    padding: 10px;
     margin-bottom: 10px;
     background-color: var(--bg-primary);
 }

@@ -1,7 +1,9 @@
 const rolesAccess = {
-    "admin": ["adding", "clock", "categories", "test"],
+    "test": ["adding", "clock", "categories", "mainTable", "test", "smallTable", "chooseTable"],
+    "admin": ["adding", "categories"],
     "adder": ["adding"],
-    "referee": ["clock"]
+    "bigReferee": ["mainTable"],
+    "referee": ["chooseTable", "smallTable", "clock"]
 }
 
 const role = localStorage.getItem("role");
@@ -13,5 +15,7 @@ if(rolesAccess[role].length === 1){
 }
 
 rolesAccess[role].forEach((role) => {
-    document.querySelector(`#${role}`).style.display = "block";
+    try{
+        document.querySelector(`#${role}`).style.display = "block";
+    }catch{}
 })
