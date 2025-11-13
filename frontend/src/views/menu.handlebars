@@ -9,10 +9,10 @@
     <a href="/zegar" id="clock" class="menu-item">Zegar</a>
     <a href="/kategorie" id="categories" class="menu-item">Kategorie</a>
     <a href="/stolikGlowny" id="mainTable" class="menu-item">Stolik Główny</a>
-    <a href="/test" id="test" class="menu-item">Test</a>
+    <a href="/wybierzStol" id="chooseTable" class="menu-item">Stolik Mały</a>
+    {{#if test}}
+        <a href="/test" id="test" class="menu-item">Test</a>
+    {{/if}}
 </div>
-<script>
-    const backendURL = "{{{backendURL}}}";
-</script>
 <script src="/menu/menu.js" type="module"></script>
 </body>

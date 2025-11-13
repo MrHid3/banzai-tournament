@@ -7,16 +7,17 @@
     <div id="login-container">
         <form id="login-form">
             <select name="role" id="role-select">
-                <option value="admin">Admin</option>
+                {{#if test}}
+                    <option value="test">Test</option>
+                {{/if}}
                 <option value="adder">Dodawanie</option>
-                <option value="referee">Sędzia</option>
+                <option value="bigReferee">Sędzia Główny</option>
+                <option value="referee">Sędzia Mniejszy</option>
+                <option value="admin">Zarządzanie</option>
             </select>
         <input id="password-input" type="password" name="password" placeholder="Hasło" required>
         <input type="submit" value="Zaloguj się">
         </form>
     </div>
-<script>
-    const backendURL = "{{{backendURL}}}";
-</script>
 <script src="/login/login.js" type="module"></script>
 </body>

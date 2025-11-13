@@ -27,8 +27,13 @@ const pool = new pg.Pool({
 const roles = [
     {role: "admin", password: process.env.USER_ADMIN_PASSWORD},
     {role: "adder", password: process.env.USER_ADD_PASSWORD},
-    {role: "referee", password: process.env.USER_TOURNAMENT_PASSWORD},
+    {role: "bigReferee", password: process.env.USER_BIG_REFEREE_PASSWORD},
+    {role: "referee", password: process.env.USER_REFEREE_PASSWORD},
 ]
+
+if(process.env.ENVIRONMENT === 'test'){
+    roles.push({role: "test", password: process.env.USER_TEST_PASSWORD});
+}
 
 const App = express();
 const server = createServer(App);
@@ -39,7 +44,6 @@ const io = new Server(server, {
 });
 
 const corsOptions ={
-
     origin:'*',
     credentials:true,
     optionSuccessStatus:200,
@@ -90,26 +94,38 @@ function authenticateToken(req, res, next){
 }
 
 function authenticateAdder(req, res, next){
-    if(req.role === "adder" || req.role === "admin"){
-        next();
-    }else{
-        res.sendStatus(401)
+    if(req.role === "adder" || req.role === "test") {
+        req.pass = true;
     }
+    next();
 }
 
 function authenticateReferee(req, res, next){
-    if(req.role === "referee" || req.role === "admin"){
-        next();
-    }else{
-        res.sendStatus(401);
+    if(req.role === "referee" || req.role === "test") {
+        req.pass = true;
     }
+    next();
 }
 
-function authenticateAdmin(req, res, next){
-    if(req.role === "admin"){
+function authenticateAdmin(req, res, next) {
+    if (req.role === "admin" || req.role === "test") {
+        req.pass = true;
+    }
+    next();
+}
+
+function authenticateBigReferee(req, res, next){
+    if (req.role === "bigReferee" || req.role === "test"){
+        req.pass = true;
+    }
+    next();
+}
+
+function authenticateRole(req, res, next){
+    if(req.pass){
         next();
     }else{
-        res.sendStatus(401)
+        res.sendStatus(403);
     }
 }
 
@@ -139,7 +155,7 @@ App.post('/verify', authenticateToken, async(req, res) => {
    res.sendStatus(200);
 })
 
-App.post('/addCompetitors', authenticateToken, authenticateAdder, async (req, res) => {
+App.post('/addCompetitors', authenticateToken, authenticateAdder, authenticateAdmin, authenticateRole, async (req, res) => {
     try{
         let wrong = [];
         const {
@@ -214,7 +230,7 @@ App.get("/getCompetitors/school/:school", authenticateToken, async (req, res) =>
     }
 })
 
-App.get("/getCategories", authenticateToken, authenticateAdmin, async (req, res) => {
+App.get("/getCategories", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
     /*
     * [
     *   {
@@ -253,7 +269,7 @@ App.get("/getCategories", authenticateToken, authenticateAdmin, async (req, res)
     }
 })
 
-App.get("/getCompetitorsWithoutCategories", authenticateToken, authenticateAdmin, async (req, res) => {
+App.get("/getCompetitorsWithoutCategories", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
     try {
         const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location FROM competitors WHERE category_id IS NULL");
         res.send(getCompetitorsQuery.rows);
@@ -263,7 +279,7 @@ App.get("/getCompetitorsWithoutCategories", authenticateToken, authenticateAdmin
     }
 })
 
-App.post("/saveCategories", authenticateToken, authenticateAdmin, async(req, res) => {
+App.post("/saveCategories", authenticateToken, authenticateAdmin, authenticateRole, async(req, res) => {
     try{
         await pool.query("UPDATE competitors SET category_id = NULL")
         await pool.query("DELETE FROM categories");
@@ -279,7 +295,7 @@ App.post("/saveCategories", authenticateToken, authenticateAdmin, async(req, res
     }
 })
 
-App.post("/saveFightResults", authenticateToken, authenticateReferee, async (req, res) => {
+App.post("/saveFightResults", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
         const {
             winner_ID,
@@ -302,20 +318,22 @@ App.post("/saveFightResults", authenticateToken, authenticateReferee, async (req
     }
 })
 
-App.get("/getFightResults", authenticateToken, async (req, res) => {
+App.get("/getFightResults", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
     const fightResultsQuery = await pool.query("SELECT * FROM fightResults");
     res.send(fightResultsQuery.rows);
 })
 
-App.get("/getFightResults/:id", authenticateToken, async (req, res) => {
+App.get("/getFightResults/:id", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
    const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE winner_id = $1 UNION SELECT * FROM fightResults WHERE loser_id = $1", [req.params.id]);
    res.send(fightResultsQuery.rows);
 })
 
-App.post("/clearBase", authenticateToken, authenticateAdmin, async (req, res) => {
-    await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE")
-    res.sendStatus(200);
-})
+if(process.env.ENVIRONMENT === "test"){
+    App.post("/clearBase", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
+        await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE")
+        res.sendStatus(200);
+    })
+}
 
 io.on("connection", socket => {
     socket.emit("award", {category: 1, competitors: [
