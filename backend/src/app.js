@@ -8,8 +8,6 @@ import jwt from 'jsonwebtoken';
 import { createServer } from "node:http"
 import { Server  } from "socket.io";
 
-import locations from "./public/resources/locations.json" with {type: "json"}
-
 dotenv.config("../");
 
 const __filename = fileURLToPath(import.meta.url);
@@ -80,16 +78,19 @@ async function initDB(){
     await pool.query("CREATE table IF NOT EXISTS config(" +
         "key varchar primary key," +
         "value varchar)")
+    await pool.query("CREATE table IF NOT EXISTS tables(" +
+        "table_number int," +
+        "category_id int references categories(id) primary key)")
     await pool.query("INSERT INTO config (key, value) values ('half', '1') ON CONFLICT (key) DO NOTHING")
     await pool.query("INSERT INTO config (key, value) values ('numberOfTables', '5') ON CONFLICT (key) DO NOTHING")
 }
 
 await initDB();
 
-let half, numberOfTables;
+let currentHalf, numberOfTables;
 async function loadConfig(){
-    half = await pool.query("SELECT value FROM config WHERE key = 'half'")
-    numberOfTables = await pool.query("SELECT value FROM config WHERE key = 'numberOfTables'")
+    currentHalf = (await pool.query("SELECT value FROM config WHERE key = 'half'")).rows[0].value
+    numberOfTables = (await pool.query("SELECT value FROM config WHERE key = 'numberOfTables'")).rows[0].value
 }
 
 await loadConfig();
@@ -284,6 +285,11 @@ App.get("/getCategories", authenticateToken, authenticateAdmin, authenticateRole
     }
 })
 
+App.get("/getCategory/:id", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
+    const competitorsQuery = await pool.query("SELECT id, name, surname FROM competitors WHERE category_id = $1", [req.params.id]);
+    res.send(competitorsQuery.rows);
+})
+
 App.get("/getCompetitorsWithoutCategories", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
     try {
         const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location FROM competitors WHERE category_id IS NULL");
@@ -334,21 +340,78 @@ App.post("/saveFightResults", authenticateToken, authenticateReferee, authentica
 })
 
 App.get("/getFightResults", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
-    const fightResultsQuery = await pool.query("SELECT * FROM fightResults");
-    res.send(fightResultsQuery.rows);
+    try{
+        const fightResultsQuery = await pool.query("SELECT * FROM fightResults");
+        res.send(fightResultsQuery.rows);
+    }catch(error){
+        console.log(error);
+        res.sendStatus(500);
+    }
 })
 
 App.get("/getFightResults/:id", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
-   const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE winner_id = $1 UNION SELECT * FROM fightResults WHERE loser_id = $1", [req.params.id]);
-   res.send(fightResultsQuery.rows);
+    try{
+        const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE winner_id = $1 UNION SELECT * FROM fightResults WHERE loser_id = $1", [req.params.id]);
+        res.send(fightResultsQuery.rows);
+    }catch(error){
+        console.log(error);
+        res.sendStatus(500);
+    }
 })
 
 if(process.env.ENVIRONMENT === "test"){
     App.post("/clearBase", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
-        await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE")
-        res.sendStatus(200);
+        try{
+            await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE; TRUNCATE tables CASCADE")
+            res.sendStatus(200);
+        }catch(error){
+            console.log(error);
+            res.sendStatus(500);
+        }
     })
 }
+
+App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
+    try{
+        const tableNumber = req.query.tableNumber;
+        const currentCategories = await pool.query("SELECT category_id FROM tables WHERE table_number = $1", [tableNumber]);
+        let categories;
+        if (currentCategories.rows.length == 0) {
+            categories = (await pool.query("SELECT id FROM categories WHERE half = $1 AND played_out IS FALSE ORDER BY id ASC LIMIT 2", [currentHalf])).rows.map(c => c.id);
+            categories.forEach(async (category) => {
+                await pool.query("INSERT INTO tables (table_number, category_id) values ($1, $2)", [tableNumber, category])
+            })
+        }else{
+            categories = currentCategories.rows.map(c => c.category_id);
+        }
+        res.send(categories);
+    }catch(error){
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+App.post("/callCompetitors", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
+    try{
+        const {competitors} = req.body;
+        res.sendStatus(200);
+    }catch(error){
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
+    try{
+        const {category_id} = req.body;
+        await pool.query("DELETE FROM tables WHERE category_id = $1", [category_id]);
+        await pool.query("UPDATE categories SET played_out = TRUE WHERE id = $1", [category_id])
+        res.sendStatus(200);
+    }catch(error){
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
 
 io.on("connection", socket => {
     socket.emit("award", {category: 1, competitors: [
@@ -374,10 +437,6 @@ io.on("connection", socket => {
                 place: 4
             }
         ]})
-})
-
-App.get("getGroups/:tableNumber", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
-
 })
 
 server.listen(3000, () => {

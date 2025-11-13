@@ -8,8 +8,11 @@ if(tableNumber == null){
 w lewym górnym rogu ma się pokazywać numer stolika
      color: text-active, background-color: highlight, zaokrąglony prawy dolny róg
 kiedy wchodzisz ciągniesz z backendu get
-    GET /getGroups/<numer stolika>?token=<token>
-    to ci oddaje jedną lub dwie grupy
+    GET /getGroups/?tableNumber=<numer stolika>&token=<token>
+        to ci oddaje jedną lub dwie grupy (tylko jedną jeżeli już się kończy ta połowa turnieju)
+    potem możesz te kategorie pociągnąć
+        GET /getCategory/<id kategori>?token=<token>
+        to ci zwraca id, imiona i nazwiska zawodników z tej kategorii
 
 po lewej stronie strony, na tego danych które dostałeś tworzysz dla każdej grupy tabelke
     tabelka zawiera imię i nazwisko
