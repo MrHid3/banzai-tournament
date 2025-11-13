@@ -25,12 +25,14 @@
         {{#unless menu}}
         <a href="/menu" id="goBack">Powrót</a>
         {{/unless}}
-        <button id="logout">Wyloguj się</button>
+        <a href="/login" id="logout">Wyloguj się</a>
     </div>
     {{/unless}}
 {{/unless}}
-{{#unless login}}
 <script>
+    const backendURL = "{{{backendURL}}}";
+    const test = "{{{test}}}"
+    {{#unless login}}
     const token = localStorage.getItem('token');
     if (!token){
         window.location.href = '/login';
@@ -49,15 +51,12 @@
             window.location.href = '/login';
         }}
     verify();
-    {{#unless login}}
         const logout = document.querySelector('#logout');
         logout.addEventListener('click', () => {
             localStorage.setItem('token', '');
-            window.location.href = '/login';
         })
     {{/unless}}
 </script>
-{{/unless}}
 {{{body}}}
 </body>
 </html>

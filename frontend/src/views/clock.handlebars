@@ -1,12 +1,91 @@
+<!DOCTYPE html>
+<html lang="pl">
 <head>
-    <meta charset="utf-8">
-    <title>menu</title>
-    <link rel="stylesheet" href="/clock/clock.css">
+  <meta charset="utf-8">
+  <title>Zegar Walki</title>
+  <link rel="stylesheet" href="/clock/clock.css">
 </head>
 <body>
-<div id="aside"></div>
-<script>
-    const backendURL = "{{{backendURL}}}"
-</script>
-<script src="/clock/clock.js"></script>
+
+  <!-- WYSUWANY GUZIK PO LEWEJ STRONIE -->
+  <div class="send-btn-wrapper-left">
+    <div class="arrow">➤</div>
+    <button id="openMenuBtn" class="btn send-btn">Wyślij</button>
+  </div>
+
+  <div class="main-container">
+
+    <!-- LEWA CZĘŚĆ 70% -->
+    <div class="left-side">
+
+      <!-- GÓRNA POŁOWA LEWEJ: Zawodnik A -->
+      <div class="left-top">
+        <div class="competitor-name" id="nameA">Zawodnik A</div>
+      </div>
+
+      <div class="divider"></div> <!-- linia dzieląca -->
+
+      <!-- DOLNA POŁOWA LEWEJ: Zawodnik B -->
+      <div class="left-bottom">
+        <div class="competitor-name" id="nameB">Zawodnik B</div>
+      </div>
+
+    </div>
+
+    <!-- PRAWA CZĘŚĆ 30% -->
+    <div class="right-side">
+
+      <!-- SEKCJA 1: Punkty zawodnika A -->
+      <div class="right-section">
+        <div class="points-wrap">
+          <div class="points" id="pointsA">0</div>
+          <button class="minus-btn" id="decA">−</button>
+        </div>
+      </div>
+
+      <!-- SEKCJA 2: Zegar -->
+      <div class="right-section">
+        <div id="timer" class="timer">3:00</div>
+      </div>
+
+      <!-- SEKCJA 3: Punkty zawodnika B -->
+      <div class="right-section">
+        <div class="points-wrap">
+          <div class="points" id="pointsB">0</div>
+          <button class="minus-btn" id="decB">−</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MENU WYNIKÓW -->
+  <div id="sendMenu" class="result-menu">
+    <h3>Wynik walki</h3>
+
+    <label>Zwycięzca:</label>
+    <select id="winnerSelect">
+      <option value="" disabled selected>-- wybierz --</option>
+      <option value="A">Zawodnik A</option>
+      <option value="B">Zawodnik B</option>
+    </select>
+
+    <label>Sposób wygranej:</label>
+    <select id="reasonSelect">
+      <option value="punkty">punkty</option>
+      <option value="poddanie">poddanie</option>
+      <option value="walkover">walkover</option>
+      <option value="decyzja sędziowska">decyzja sędziowska</option>
+    </select>
+
+    <button id="sendResultBtn" class="btn">Wyślij</button>
+    <button id="cancelSendBtn" class="btn secondary">Anuluj</button>
+
+    <div id="sendStatus" class="small"></div>
+  </div>
+
+  <!-- JS na końcu body, po wszystkich elementach -->
+  <script src="/clock/clock.js"></script>
 </body>
+</html>
