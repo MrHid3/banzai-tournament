@@ -1,3 +1,42 @@
 @import url("../colors.css");
 
+#tableButtonsContainer{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: calc(45vh + 40px);
+    width: fit-content;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    gap: 5px;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
 
+.tableButton{
+    text-decoration: none;
+    color: var(--text-active);
+    height: 15vh;
+    min-width: 15vh;
+    background-color: var(--highlight);
+    text-align: center;
+    line-height: 15vh;
+    font-size: 10vh;
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+.tableButton:first-child{
+    border-top-left-radius: 10px;
+}
+
+.tableButton:last-child{
+    border-bottom-right-radius: 10px;
+}
+
+.tableButton:hover{
+    background-color: #cc000099;
+}

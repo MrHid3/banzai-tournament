@@ -71,7 +71,7 @@ logoutButton.addEventListener("click", (e) => {
 resetButton.addEventListener("click", (e) => {
     if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
         if(confirm("Jesteś pewny? Niezapisane zmiany zostaną utracone")){
-           location.href = "/dodawanie"
+           window.location.reload();
         }
     }
 })

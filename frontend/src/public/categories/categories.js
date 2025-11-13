@@ -99,8 +99,15 @@ async function podzialNaGrupy(){
         const existing = await res.json();
         if (Array.isArray(existing) && existing.length > 0) {
             wyswietlGrupy(existing.map((g, i) => g));
+            let counter = 0;
+            const h3 = document.querySelectorAll("h3").forEach(e => {
+                const i = document.createElement("i");
+                i.textContent = `${existing[counter].half} połowa`
+                e.parentNode.insertBefore(i, e.nextSibling);
+                // e.innerHTML = `<i>${existing[counter].half} połowa</i>`
+                counter++;
+            })
             document.getElementById('zapisz').classList.remove('hidden');
-
             const resBez = await fetch(`${backendURL}/getCompetitorsWithoutCategories?token=${token}`);
             const bezKat = await resBez.json();
             if (bezKat.length > 0) {
@@ -160,12 +167,10 @@ function wyswietlGrupy(listaGrup){
     listaGrup = listaGrup
         .map(g => Array.isArray(g) ? g : g.zawodnicy || [])
         .filter(grupa => grupa.length > 0);
-
     listaGrup.forEach((grupaZawodnikow, numerGrupy) => {
         const blokGrupy = document.createElement('div');
         blokGrupy.classList.add('grupa');
         blokGrupy.dataset.katId = numerGrupy + 1;
-
         blokGrupy.innerHTML = `<h3>Kategoria ${numerGrupy+1}</h3>`;
 
         addDragDropListener(blokGrupy);

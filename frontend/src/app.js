@@ -57,8 +57,12 @@ if(process.env.ENVIRONMENT === "test"){
     })
 }
 
-App.get("/wybierzStol", cors(), (req, res) => {
+App.get("/wybierzStolik", cors(), (req, res) => {
     res.render("chooseTable");
+})
+
+App.get("/stolikMaly", cors(), (req, res) => {
+    res.render("smallTable");
 })
 
 App.listen(4000, () => {
