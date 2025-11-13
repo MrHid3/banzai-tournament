@@ -1,0 +1,251 @@
+:root {
+  --bg-primary: #242e35;
+  --bg-secondary: #1d1d1b;
+  --bg-action: #ffffff;
+  --text-primary: #a0969a;
+  --text-active: #ffffff;
+  --highlight: #cc0000;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.main-container {
+  display: flex;
+  height: 100%;
+}
+
+/* LEWA STRONA */
+.left-side {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  position: relative;
+}
+
+/* Wysuwany przycisk po lewej — ZMNIEJSZONY 2x */
+.send-btn-wrapper-left {
+  position: absolute;
+  top: 30%;
+  left: 0;
+  z-index: 1000;
+}
+
+.send-btn-wrapper-left .arrow {
+  font-size: 28px; /* było 56px */
+  cursor: pointer;
+  color: var(--highlight);
+  display: inline-block;
+}
+
+.send-btn-wrapper-left .send-btn {
+  position: absolute;
+  left: 30px; /* było 60px */
+  top: 0;
+  display: block;
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  width: 130px; /* było 260px */
+  text-align: center;
+  padding: 12px 0; /* było 24px */
+  font-size: 18px; /* było 36px */
+}
+
+.send-btn-wrapper-left:hover .send-btn {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Lewa góra i dół – środek */
+.left-top,
+.left-bottom {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Imię i nazwisko */
+.competitor-name {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  font-weight: bold;
+  color: var(--text-active);
+}
+
+.competitor-name .first-name,
+.competitor-name .last-name {
+  font-size: 96px;
+  line-height: 1;
+  color: var(--text-active);
+  margin: 8px 0;
+}
+
+/* Linia podziału */
+.divider {
+  height: 2px;
+  width: 100%;
+  background: var(--text-primary);
+}
+
+/* PRAWA STRONA */
+.right-side {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  border-left: 2px solid var(--text-primary);
+}
+
+.right-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-bottom: 2px solid var(--text-primary);
+}
+
+.right-section:last-child {
+  border-bottom: none;
+}
+
+/* PUNKTY */
+.points-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.points-wrap .points {
+  width: 100%;
+  height: 100%;
+  font-size: 6em;
+  background: var(--bg-action);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg-secondary);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Minus */
+.minus-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 0;
+  background: var(--bg-action);
+  color: var(--bg-secondary);
+  font-size: 48px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+  line-height: 0.8;
+}
+
+.minus-btn:hover {
+  background: #e6e6e6;
+}
+
+/* ZEGAR */
+.right-section #timer {
+  width: 100%;
+  height: 100%;
+  font-size: 8em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0;
+  background: var(--bg-action);
+  color: var(--bg-secondary);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.3s ease;
+}
+
+.timer.blink {
+  background: var(--highlight) !important;
+  color: var(--text-active);
+}
+
+/* MENU WYNIKÓW — ZMNIEJSZONE 2x */
+.result-menu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-secondary);
+  padding: 30px; /* było 60px */
+  border-radius: 0;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  display: none;
+  flex-direction: column;
+  gap: 14px; /* było 28px */
+  align-items: center;
+  justify-content: center;
+  width: 340px; /* było 680px */
+  z-index: 1000;
+  font-size: 18px; /* było 36px */
+}
+
+.btn {
+  background: var(--highlight);
+  color: var(--text-active);
+  border: none;
+  padding: 14px 0; /* było 28px */
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 18px; /* było 36px */
+  transition: background 0.2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.btn:hover {
+  background: #a30000;
+}
+
+.btn.secondary {
+  background: var(--bg-action);
+  color: var(--bg-secondary);
+}
+
+.small {
+  font-size: 14px; /* było 28px */
+  color: var(--text-primary);
+}
+
+.blink2{
+  animation:blink2 0.5s infinite
+}
+
+@keyframes blink2{
+  0%{
+    background-color: white;
+  }
+  50%{
+    background-color: red;
+  }
+  100%{
+    background-color: white;
+  }
+}
