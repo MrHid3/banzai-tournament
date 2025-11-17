@@ -19,9 +19,10 @@ h1{
     color: var(--text-active);
     border-color: var(--text-inactive);
     border-style: solid;
-    height: 5%;
     padding: 5px;
     vertical-align: center;
+    display: block;
+    height: 50px;
 }
 
 #callContainer h1{
@@ -34,16 +35,119 @@ h1{
     border-radius: 0 10px 0 0;
 }
 
-#call, #awards{
-    height: 95% ;
+#calls, #awards{
+    height: calc(100% - 50px);
     border-style: solid;
-    border-color: var(--text-inactive);
+    border-color: var(--text-active);
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
 }
 
-#call{
+#calls::-webkit-scrollbar, #awards::-webkit-scrollbar {
+    /*display: none;*/
+    background-color: transparent;
+    width: 5px;
+}
+
+#calls::-webkit-scrollbar-thumb, #awards::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 10px;
+}
+
+#calls{
     border-width: 0 1px 0 0;
 }
 
 #awards{
     border-width: 0 0 0 1px;
 }
+
+.awardContainer, .callContainer{
+    color: var(--text-inactive);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    /*border-radius: 15px;*/
+    padding: 10px;
+    margin: 10px auto;
+    border: 2px solid var(--bg-action);
+    width: fit-content;
+    max-width: 90%;
+    position: relative;
+}
+
+.awardContainer{
+    border-radius: 5px 10px 10px 5px;
+    border-width: 1px 0 1px 0;
+}
+
+.callContainer{
+    border-radius: 10px 5px 5px 10px;
+    border-width: 1px 0 1px 0;
+}
+
+.awardContainer p, .callContainer p{
+    text-align: center;
+    display: block;
+    width: 100%;
+    color: var(--text-active);
+    font-weight: bold;
+    padding: 5px 50px;
+}
+
+.competitor{
+    text-wrap: wrap;
+    word-wrap: break-word;
+    display: block;
+    text-align: left !important;
+    line-height: 20px;
+    border: 2px solid var(--text-active);
+    padding: 5px;
+    border-radius: 5px;
+    margin: 2px;
+    color: var(--text-inactive) !important;
+    /*overflow: hidden;*/
+}
+
+.competitorContainer{
+    width: fit-content;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.delete{
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    padding: 5px;
+    font-size: 10px;
+    line-height: 10px;
+    color: var(--text-active);
+    border-radius: 0 5px 0 5px;
+    cursor: pointer;
+}
+
+/*.dissapear{*/
+/*    animation: delete 0.5s linear;*/
+/*    height: 0;*/
+/*    overflow: hidden;*/
+/*    padding: 0;*/
+/*    display: none;*/
+/*}*/
+/**/
+/*@keyframes delete{*/
+/*    from{*/
+/*        height: 100%;*/
+/*        display: block;*/
+/*    }to{*/
+/*    height: 0;*/
+/*    display: none;*/
+/*    margin: 0;*/
+/*         }*/
+/*}*/

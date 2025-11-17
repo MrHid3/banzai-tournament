@@ -22,7 +22,7 @@ po lewej stronie strony, na tego danych które dostałeś tworzysz dla każdej g
 nad tabelkami masz przycisk ZAWOŁAJ
     color: text-active, background-color: highlight
     wysyła listę id zawodników, którzy nie są kliknięci (domyślnie nie są kliknięci)
-        POST /callCompetitors {token: <token>, competitors: [<id pierwszego, id drugiego, ...>]}
+        POST /callCompetitors {token: <token>, mat: <numer maty>, competitors: [<id pierwszego, id drugiego, ...>]}
             jeżeli zwrócony kod 200:
                 komunikat sukcesu (zwykły div, nie alert) "Zawołanie wysłane"
                 przycisk ZAWOŁAJ jest wyłączony na 30 sekund
@@ -66,5 +66,8 @@ pod tabelkami/listami przycisk zakończ grupy
     po kliknięciu
         dla każdej grupy wysyła request na serwer (czyli jeśli są dwie grupy wyśle dwa requesty)
             POST /endCategory {token: <token>, category_id: <id kategorii>}
-        przeładowuję stronę, tak żeby zaczęły się kolejne kategorie
+            jeżeli zwraca 400
+                mówi że trzeba wcześniej rozegrać wszystkie walki
+            inaczej
+                przeładowuję stronę, tak żeby zaczęły się kolejne kategorie
 */

@@ -90,6 +90,8 @@ async function fetchCompetitors() {
     const competitors = [];
     if (competitorA) competitors.push(competitorA);
     if (competitorB) competitors.push(competitorB);
+    getElement("zawodnikA").textContent = competitorA.name + " " + competitorA.surname;
+    getElement("zawodnikB").textContent = competitorB.name + " " + competitorB.surname;
     return competitors;
   }
 
@@ -182,7 +184,7 @@ async function sendFightResult() {
   const urlParams = new URLSearchParams(window.location.search);
   const category_ID = urlParams.get("category");
 
-  if (!token || !category_ID) {
+  if (!category_ID) {
     alert("Brak tokena lub kategorii – nie można wysłać wyniku!");
     return;
   }
@@ -192,18 +194,18 @@ async function sendFightResult() {
   let winner_points = winner === "A" ? pointsA : pointsB;
   let loser_points = winner === "A" ? pointsB : pointsA;
 
-  switch(reason.toLowerCase()) {
-    case "walkover":
-    case "decyzja sędziowska":
-      winner_points += 1;
-      break;
-    case "poddanie":
-      winner_points = 99;
-      if (winner === "A") pointsA = winner_points;
-      else pointsB = winner_points;
-      updatePointsDisplay();
-      break;
-  }
+  // switch(reason.toLowerCase()) {
+  //   case "walkover":
+  //   case "decyzja sędziowska":
+  //     winner_points += 1;
+  //     break;
+  //   case "poddanie":
+  //     winner_points = 99;
+  //     if (winner === "A") pointsA = winner_points;
+  //     else pointsB = winner_points;
+  //     updatePointsDisplay();
+  //     break;
+  // }
 
   const payload = {
     token,

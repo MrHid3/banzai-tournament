@@ -96,6 +96,8 @@ async function loadConfig(){
 await loadConfig();
 
 function authenticateToken(req, res, next){
+    delete req.pass;
+    delete req.role;
     const token = req.body.token || req.query.token;
     if(!token)
         return res.sendStatus(401)
@@ -326,13 +328,10 @@ App.post("/saveFightResults", authenticateToken, authenticateReferee, authentica
             category_ID,
             reason
         } = req.body;
-        if(winner_ID && winner_points && loser_ID && loser_points && category_ID && reason){
-            await pool.query("INSERT INTO fightResults (category_id, winner_id, winner_points, loser_id, loser_points, reason) " +
-                "VALUES ($1, $2, $3, $4, $5, $6)", [category_ID, winner_ID, winner_points, loser_ID, loser_points, reason])
-            res.sendStatus(200)
-        }else{
-            res.sendStatus(400)
-        }
+        await pool.query("DELETE FROM fightResults WHERE (winner_id = $1 AND loser_id = $2) OR (winner_id = $2 AND loser_id = $1)", [winner_ID, loser_ID])
+        await pool.query("INSERT INTO fightResults (category_id, winner_id, winner_points, loser_id, loser_points, reason) " +
+            "VALUES ($1, $2, $3, $4, $5, $6)", [category_ID, winner_ID, winner_points, loser_ID, loser_points, reason])
+        res.sendStatus(200)
     }catch(error){
         console.log(error);
         res.sendStatus(500)
@@ -351,7 +350,17 @@ App.get("/getFightResults", authenticateToken, authenticateAdmin, authenticateRo
 
 App.get("/getFightResults/:id", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
     try{
-        const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE winner_id = $1 UNION SELECT * FROM fightResults WHERE loser_id = $1", [req.params.id]);
+        const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE winner_id = $1 OR loser_id = $1", [req.params.id]);
+        res.send(fightResultsQuery.rows);
+    }catch(error){
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+App.get("/getCategoryResults/:id", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
+    try{
+        const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE category_id = $1", [req.params.id]);
         res.send(fightResultsQuery.rows);
     }catch(error){
         console.log(error);
@@ -393,7 +402,9 @@ App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, 
 
 App.post("/callCompetitors", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
-        const {competitors} = req.body;
+        const {competitors, matNumber} = req.body;
+        const competitorsQuery = await pool.query("SELECT name, surname FROM competitors WHERE id = ANY($1::int[])", [competitors])
+        io.sockets.emit("call", {matNumber: matNumber , competitors: competitorsQuery.rows});
         res.sendStatus(200);
     }catch(error){
         console.log(error);
@@ -405,7 +416,49 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
     try{
         const {category_id} = req.body;
         await pool.query("DELETE FROM tables WHERE category_id = $1", [category_id]);
-        await pool.query("UPDATE categories SET played_out = TRUE WHERE id = $1", [category_id])
+        await pool.query("UPDATE categories SET played_out = TRUE WHERE id = $1", [category_id]);
+        const competitors = (await pool.query("SELECT id, name, surname, location FROM competitors WHERE category_id = $1", [category_id])).rows;
+        const fights = (await pool.query("SELECT * FROM fightResults WHERE category_id = $1", [category_id])).rows;
+        if(fights.length < competitors.length * (competitors.length - 1) / 2){
+            res.sendStatus(400);
+            return;
+        }
+        for(let competitor of competitors){
+            competitor.wins = {};
+            competitor.points = 0;
+            for(let fight of fights){
+                if(fight.winner_id === competitor.id && fight.reason !== "default"){
+                    competitor.wins[fight.loser_id] = true;
+                    competitor.points += fight.winner_points;
+                    if(fight.reason === "tap")
+                        competitor.points += 99;
+                }
+                if(fight.loser_id === competitor.id)
+                    competitor.points += fight.loser_points;
+            }
+        }
+        competitors.sort((a, b) => {
+            if(a.wins[b.id]) return -1;
+            if(b.wins[a.id]) return 1;
+            return(b.points - a.points);
+        })
+        for(let i in competitors){
+            if(i == 0){
+                competitors[i].place = 1;
+            } else if(competitors[i - 1].place == 3){
+                competitors[i].place = 3;
+            } else if (competitors[i - 1].points === competitors[i].points){
+                competitors[i].place = competitors[i -1 ].place;
+            } else {
+                competitors[i].place = competitors[i - 1].place + 1;
+            }
+        }
+        for(let c of competitors){
+            delete c.points;
+            delete c.wins;
+            delete c.location;
+        }
+        io.sockets.emit("award", {category: category_id, competitors: competitors})
         res.sendStatus(200);
     }catch(error){
         console.log(error);
@@ -414,29 +467,44 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
 })
 
 io.on("connection", socket => {
-    socket.emit("award", {category: 1, competitors: [
-            {
-                name: "bob",
-                surname: "odenkirk",
-                school: "spnr1",
-                place: 1
-            }, {
-                name: "walter",
-                surname: "whities",
-                school: "spnr2",
-                place: 2
-            }, {
-                name: "kim",
-                surname: "sexler",
-                school: "spnr3",
-                place: 3
-            }, {
-                name: "jesse",
-                surname: "gayman",
-                school: "spnr4",
-                place: 4
-            }
-        ]})
+    // for(let i = 0; i < 10; i++)
+    // socket.emit("award", {category: 1, competitors: [
+    //         {
+    //             name: "bobaaaaaaaaaaaaaaaaa",
+    //             surname: "odenkirk",
+    //             school: "spnr1",
+    //             place: 1
+    //         }, {
+    //             name: "waaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaalter",
+    //             surname: "whities",
+    //             place: 2
+    //         }, {
+    //             name: "kim",
+    //             surname: "sexler",
+    //             place: 3
+    //         }, {
+    //             name: "jesse",
+    //             surname: "gayman",
+    //             place: 4
+    //         }
+    //     ]})
+    // for(let i = 0; i < 10; i++)
+    // socket.emit("call", {mat: 1, competitors: [
+    //         {
+    //             name: "bobaaaaaaaaaaaaaaaaa",
+    //             surname: "odenkirk",
+    //             school: "spnr1",
+    //         }, {
+    //             name: "aaaaaaalter",
+    //             surname: "whities",
+    //         }, {
+    //             name: "kim",
+    //             surname: "sexler",
+    //         }, {
+    //             name: "jesse",
+    //             surname: "gayman",
+    //         }
+    //     ]})
 })
 
 server.listen(3000, () => {

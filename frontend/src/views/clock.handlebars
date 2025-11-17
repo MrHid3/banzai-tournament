@@ -65,16 +65,17 @@
     <label>Zwycięzca:</label>
     <select id="winnerSelect">
       <option value="" disabled selected>-- wybierz --</option>
-      <option value="A">Zawodnik A</option>
-      <option value="B">Zawodnik B</option>
+      <option value="A" id="zawodnikA">Zawodnik A</option>
+      <option value="B" id="zawodnikB">Zawodnik B</option>
     </select>
 
     <label>Sposób wygranej:</label>
     <select id="reasonSelect">
-      <option value="punkty">punkty</option>
-      <option value="poddanie">poddanie</option>
-      <option value="walkover">walkover</option>
-      <option value="decyzja sędziowska">decyzja sędziowska</option>
+      <option value="points">Punkty</option>
+      <option value="tap">Poddanie</option>
+      <option value="walkover">Walkover</option>
+      <option value="referee">Decyzja Sędziowska</option>
+      <option value="default">Obaj zawodnicy nie przyszli</option>
     </select>
 
     <button id="sendResultBtn" class="btn">Wyślij</button>
