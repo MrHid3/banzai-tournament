@@ -51,10 +51,13 @@
             window.location.href = '/login';
         }}
     verify();
-        const logout = document.querySelector('#logout');
-        logout.addEventListener('click', () => {
+    const logout = document.querySelector('#logout');
+    logout.addEventListener('click', (e) => {
+        if(!confirm("Czy na pewno chcesz się wylogować?"))
+            e.preventDefault();
+        else
             localStorage.setItem('token', '');
-        })
+    })
     {{/unless}}
 </script>
 {{{body}}}

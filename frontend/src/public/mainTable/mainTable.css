@@ -42,6 +42,7 @@ h1{
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 #calls::-webkit-scrollbar, #awards::-webkit-scrollbar {
@@ -64,35 +65,34 @@ h1{
 }
 
 .awardContainer, .callContainer{
-    color: var(--text-inactive);
+    /*color: var(--bg-primary);*/
     display: flex;
     flex-direction: column;
     gap: 5px;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: var(--text-active);
     /*border-radius: 15px;*/
     padding: 10px;
     margin: 10px auto;
-    border: 2px solid var(--bg-action);
+    border: 5px solid var(--highlight);
     width: fit-content;
     max-width: 90%;
     position: relative;
+    border-width: 0 2px 0 2px;
 }
 
 .awardContainer{
     border-radius: 5px 10px 10px 5px;
-    border-width: 1px 0 1px 0;
 }
 
 .callContainer{
     border-radius: 10px 5px 5px 10px;
-    border-width: 1px 0 1px 0;
 }
 
 .awardContainer p, .callContainer p{
     text-align: center;
     display: block;
     width: 100%;
-    color: var(--text-active);
+    color: var(--bg-secondary);
     font-weight: bold;
     padding: 5px 50px;
 }
@@ -109,6 +109,7 @@ h1{
     margin: 2px;
     color: var(--text-inactive) !important;
     /*overflow: hidden;*/
+    transition-duration: 1s;
 }
 
 .competitorContainer{
@@ -129,25 +130,27 @@ h1{
     font-size: 10px;
     line-height: 10px;
     color: var(--text-active);
-    border-radius: 0 5px 0 5px;
+    border-radius: 0 0 0 5px;
     cursor: pointer;
 }
 
-/*.dissapear{*/
-/*    animation: delete 0.5s linear;*/
-/*    height: 0;*/
-/*    overflow: hidden;*/
-/*    padding: 0;*/
-/*    display: none;*/
-/*}*/
-/**/
-/*@keyframes delete{*/
-/*    from{*/
-/*        height: 100%;*/
-/*        display: block;*/
-/*    }to{*/
-/*    height: 0;*/
-/*    display: none;*/
-/*    margin: 0;*/
-/*         }*/
-/*}*/
+.magic{
+    animation: slideout 0.2s ease-in-out;
+    /*height: 0;*/
+    height: 0;
+    padding: 0;
+    margin: 0 auto;
+    width: 80%;
+    overflow: hidden;
+    transition-duration: 0.2s;
+}
+
+@keyframes slideout{
+    from{
+        height: 200px;
+    }to{
+        /*left: 1000px;*/
+        height: 0;
+        width: 20%;
+    }
+}
