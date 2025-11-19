@@ -384,8 +384,8 @@ App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, 
         const tableNumber = req.query.tableNumber;
         const currentCategories = await pool.query("SELECT category_id FROM tables WHERE table_number = $1", [tableNumber]);
         let categories;
-        if (currentCategories.rows.length == 0) {
-            categories = (await pool.query("SELECT id FROM categories WHERE half = $1 AND played_out IS FALSE ORDER BY id ASC LIMIT 2", [config.half])).rows.map(c => c.id);
+        if (currentCategories.rows.length === 0) {
+            categories = (await pool.query("SELECT id FROM categories WHERE half = $1 AND played_out IS FALSE ORDER BY id ASC LIMIT 2 AND category_id NOT IN (SELECT category_id FROM tables)", [config.half])).rows.map(c => c.id);
             categories.forEach(async (category) => {
                 await pool.query("INSERT INTO tables (table_number, category_id) values ($1, $2)", [tableNumber, category])
             })
@@ -418,32 +418,35 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
         const fights = (await pool.query("SELECT * FROM fightResults WHERE category_id = $1", [category_id])).rows;
         const competitors = (await pool.query("SELECT id, name, surname, location, is_name_duplicate FROM competitors WHERE category_id = $1", [category_id])).rows;
         if(fights.length < competitors.length * (competitors.length - 1) / 2){
-            // res.sendStatus(400);
-            // return;
+            res.sendStatus(400);
+            return;
         }
-        // await pool.query("DELETE FROM tables WHERE category_id = $1", [category_id]);
-        // await pool.query("UPDATE categories SET played_out = TRUE WHERE id = $1", [category_id]);
+        await pool.query("DELETE FROM tables WHERE category_id = $1", [category_id]);
+        await pool.query("UPDATE categories SET played_out = TRUE WHERE id = $1", [category_id]);
         for(let competitor of competitors){
             competitor.wins = {};
             competitor.points = 0;
             for(let fight of fights){
-                if((fight.winner_id === competitor.id || fight.loser_id === competitor.id) && fight.reason === "default")
-                    competitor.default = true;
+                // if((fight.winner_id === competitor.id || fight.loser_id === competitor.id) && fight.reason === "default")
+                //     competitor.default = true;
                 if(fight.winner_id === competitor.id && fight.reason !== "default"){
                     competitor.wins[fight.loser_id] = true;
                     competitor.points += fight.winner_points;
-                    if(fight.reason === "tap")
+                    if(fight.reason == "tap")
                         competitor.points += 99;
                 }
                 if(fight.loser_id === competitor.id)
                     competitor.points += fight.loser_points;
             }
         }
+        competitors.sort((a,b) => a.points - b.points);
         competitors.sort((a, b) => {
-            if(a.default) return 1;
-            if(a.wins[b.id]) return -1;
-            if(b.wins[a.id]) return 1;
-            return(b.points - a.points);
+            // if(a.default) return -1;
+            // if(b.default) return 1;
+            if(Object.keys(a.wins).length === Object.keys(b.wins).length){
+                if(a.wins[b.id]) return -1;
+                if(b.wins[a.id]) return 1;
+            }
         })
         for(let i in competitors){
             if(i == 0){
@@ -462,8 +465,9 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
             if(!c.is_name_duplicate)
                 delete c.location;
             delete c.is_name_duplicate;
+            await pool.query("UPDATE competitors SET place = $1 WHERE id = $2", [c.place, c.id]);
         }
-        console.log(competitors)
+        // competitors.filter((c) => c.default);
         io.sockets.emit("award", {category: category_id, competitors: competitors})
         res.sendStatus(200);
     }catch(error){

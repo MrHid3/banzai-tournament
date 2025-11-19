@@ -67,7 +67,7 @@ async function fetchSingleCompetitor(id) {
   const urlParams = new URLSearchParams(window.location.search);
 
   try {
-    const response = await fetch(`http://localhost:3000/getCompetitor/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`);
+    const response = await fetch(`${backendURL}/getCompetitor/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`);
     if (!response.ok) throw new Error(`Błąd pobierania zawodnika ${id}: ${response.status}`);
     const data = await response.json();
     return Array.isArray(data) ? data[0] : data;
@@ -97,7 +97,7 @@ async function fetchCompetitors() {
 
   if (token) {
     try {
-      const response = await fetch(`http://localhost:3000/getCompetitor/${encodeURIComponent(token)}`, {
+      const response = await fetch(`${backendURL}/getCompetitor/${encodeURIComponent(token)}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!response.ok) throw new Error(`Błąd pobierania zawodników: ${response.status}`);
@@ -220,7 +220,7 @@ async function sendFightResult() {
   getElement("sendStatus").textContent = "⏳ Wysyłanie...";
 
   try {
-    const response = await fetch("http://localhost:3000/saveFightResults", {
+    const response = await fetch(`${backendURL}/saveFightResults`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
