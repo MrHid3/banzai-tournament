@@ -67,7 +67,7 @@ async function fetchSingleCompetitor(id) {
   const urlParams = new URLSearchParams(window.location.search);
 
   try {
-    const response = await fetch(`${backendURL}/getCompetitor/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`);
+    const response = await fetch(`${backendURL}/getCompetitor/${id}?token=${token}`);
     if (!response.ok) throw new Error(`Błąd pobierania zawodnika ${id}: ${response.status}`);
     const data = await response.json();
     return Array.isArray(data) ? data[0] : data;
@@ -95,19 +95,17 @@ async function fetchCompetitors() {
     return competitors;
   }
 
-  if (token) {
-    try {
-      const response = await fetch(`${backendURL}/getCompetitor/${encodeURIComponent(token)}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error(`Błąd pobierania zawodników: ${response.status}`);
-      const competitors = await response.json();
-      return Array.isArray(competitors) ? competitors : [];
-    } catch (error) {
-      console.error("Błąd pobierania zawodników (token):", error);
-      return [];
-    }
-  }
+  // if (token) {
+  //   try {
+  //     const response = await fetch(`${backendURL}/getCompetitor/${id}?token=${token}`);
+  //     if (!response.ok) throw new Error(`Błąd pobierania zawodników: ${response.status}`);
+  //     const competitors = await response.json();
+  //     return Array.isArray(competitors) ? competitors : [];
+  //   } catch (error) {
+  //     console.error("Błąd pobierania zawodników (token):", error);
+  //     return [];
+  //   }
+  // }
 
   console.error("Brak tokena ani id1/id2 w adresie URL!");
   return [];

@@ -287,7 +287,7 @@ App.get("/getCategories", authenticateToken, authenticateAdmin, authenticateRole
 })
 
 App.get("/getCategory/:id", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
-    const competitorsQuery = await pool.query("SELECT id, name, surname FROM competitors WHERE category_id = $1", [req.params.id]);
+    const competitorsQuery = await pool.query("SELECT id, name, surname, level FROM competitors WHERE category_id = $1", [req.params.id]);
     res.send(competitorsQuery.rows);
 })
 
