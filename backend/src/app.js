@@ -385,7 +385,7 @@ App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, 
         const currentCategories = await pool.query("SELECT category_id FROM tables WHERE table_number = $1", [tableNumber]);
         let categories;
         if (currentCategories.rows.length === 0) {
-            categories = (await pool.query("SELECT id FROM categories WHERE half = $1 AND played_out IS FALSE ORDER BY id ASC LIMIT 2 AND category_id NOT IN (SELECT category_id FROM tables)", [config.half])).rows.map(c => c.id);
+            categories = (await pool.query("SELECT id FROM categories WHERE half = $1 AND played_out IS FALSE AND id NOT IN (SELECT category_id FROM tables) ORDER BY id ASC LIMIT 2 ", [config.half])).rows.map(c => c.id);
             categories.forEach(async (category) => {
                 await pool.query("INSERT INTO tables (table_number, category_id) values ($1, $2)", [tableNumber, category])
             })
