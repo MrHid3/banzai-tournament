@@ -1,73 +1,233 @@
-//to ci ciągnie numer stolika który ktoś wybrał i wywala do wyboru stolika jeżeli nie wybrał
 const tableNumber = localStorage.getItem("tableNumber");
-if(tableNumber == null){
-    window.location.href="/wybierzStolik"
+
+if (!tableNumber) window.location.href = "/wybierzStolik";
+
+const divTableNumber = document.getElementById('table-number');
+divTableNumber.classList.add('TableText');
+divTableNumber.textContent = "Stolik: "+tableNumber;
+const butZawolaj = document.getElementById('Zawolaj');
+const niepot = document.getElementById("niepotrzebne");
+let Zawodnicy = [];
+
+
+//                Wypełnianie Tabeli
+
+function fillTable(tableId, categoryId, competitors){
+    const table = document.getElementById(tableId);
+
+    const th = table.querySelector("thead th");
+    th.colSpan = 2;
+    th.innerHTML = `Kategoria: ${categoryId}
+    <span class="level-right">Level ${competitors[0].level+1}</span>
+    `;
+
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML ="";
+    console.log(competitors);
+    competitors.forEach(tab => {
+        const tr = document.createElement("tr");
+
+        const tdName = document.createElement("td");
+        tdName.textContent = tab.name;
+
+        const tdSurname = document.createElement("td");
+        tdSurname.textContent = tab.surname;
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdSurname);
+        tbody.appendChild(tr);
+
+        Zawodnicy.push(tab.id);
+        tr.addEventListener("click", () =>{
+            tr.classList.toggle("selected");
+            let cc = Zawodnicy.findIndex(cc => cc == tab.id);
+            if(cc==-1){
+                Zawodnicy.push(tab.id);
+            }else{
+                Zawodnicy.splice(cc, 1);
+            }
+        });
+    });
 }
 
-/*
-w lewym górnym rogu ma się pokazywać numer stolika
-     color: text-active, background-color: highlight, zaokrąglony prawy dolny róg
-kiedy wchodzisz ciągniesz z backendu get
-    GET /getGroups/?tableNumber=<numer stolika>&token=<token>
-        to ci oddaje jedną lub dwie grupy (tylko jedną jeżeli już się kończy ta połowa turnieju)
-    potem możesz te kategorie pociągnąć
-        GET /getCategory/<id kategori>?token=<token>
-        to ci zwraca id, imiona i nazwiska zawodników z tej kategorii
+async function fillList(categoryId, competitors) {
+    const listDiv = document.getElementById("fightlist");
 
-po lewej stronie strony, na tego danych które dostałeś tworzysz dla każdej grupy tabelke
-    tabelka zawiera imię i nazwisko
-        border-color: black, background-color: bg-secondary, color: text-inactive
-        każdy rząd możesz klinkąć lub odkliknąć
-            kliknięty: background-color: bg-primary, color: text-active
-nad tabelkami masz przycisk ZAWOŁAJ
-    color: text-active, background-color: highlight
-    wysyła listę id zawodników, którzy nie są kliknięci (domyślnie nie są kliknięci)
-        POST /callCompetitors {token: <token>, mat: <numer maty>, competitors: [<id pierwszego, id drugiego, ...>]}
-            jeżeli zwrócony kod 200:
-                komunikat sukcesu (zwykły div, nie alert) "Zawołanie wysłane"
-                przycisk ZAWOŁAJ jest wyłączony na 30 sekund
-            inaczej:
-                komunikat błędu "Nie wysłano zawołania"
-obok tabelki jest napisany poziom grupy
+    const categoryDiv = document.createElement("div");
+    categoryDiv.classList.add("fight-category");
+    categoryDiv.id = `category-${categoryId}`;
 
-po prawej stronie strony tworzysz listę dla każdej grupy
-możesz przełączyć między widokiem tabelki albo listy przełącznikiem nad listami
-lista:
-    każdy rząd to jedna walka w style [bob marley] [john cena]
-    sprawdzasz czy już walczyli
-        GET /getFightResults/<id pierwszego zawodnika>?token=<token>
-            patrzysz czy w liście którą dostaniesz jest id drugiego zawodnika
-        jeżeli nie
-            color: bg-primary, background-color: bg-action
-        jeżeli tak
-            color: text-active, background-color: highlight
-            jak klikniesz wyskakuje alert "Ta walka już się rozegrała. Czy na pewno chcesz ją powtórzyć?"
-    po kliknięciu na rząd jesteś przeniesiony na /zegar?id=<id pierwszego>&id2=<id drugiego>
-tabelka:
-    tabela o wymiarach x + 1 * x + 1, gdzie x to liczba zawdoników w kategorii
-    lewe górne pole puste
-    w reszcie górnego rzędu i lewej kolumny komórki z imionami po kolej
-        nazwiska pod imieniami
-    pola
-        sprawdzasz czy zawodnicy już walczyli
-            GET /getFightResults/<id pierwszego zawodnika>?token=<token>
-                patrzysz czy w liście którą dostaniesz jest id drugiego zawodnika
-            jeżeli nie
-                background-color: bg-action
-            jeżeli tak
-                background-color: highlight
-                jak klikniesz wyskakuje alert "Ta walka już się rozegrała. Czy na pewno chcesz ją powtórzyć?"
-            pola na skrzyżowaniu zawodnika samego ze sobą są wyiksowane i nie można ich kliknąć
-    po kliknięciu na pole jesteś przeniesiony na /zegar?id=<id pierwszego>&id2=<id drugiego>
+    const header = document.createElement("div");
+    header.classList.add("fight-list-header");
+    header.textContent = `Kategoria: ${categoryId}`;
 
-pod tabelkami/listami przycisk zakończ grupy
-    pojawia się dopiero kiedy wszyskie walki się rozegrają
-    background-color: highlight, color: text-active
-    po kliknięciu
-        dla każdej grupy wysyła request na serwer (czyli jeśli są dwie grupy wyśle dwa requesty)
-            POST /endCategory {token: <token>, category_id: <id kategorii>}
-            jeżeli zwraca 400
-                mówi że trzeba wcześniej rozegrać wszystkie walki
-            inaczej
-                przeładowuję stronę, tak żeby zaczęły się kolejne kategorie
-*/
+    if (competitors[0] && competitors[0].level !== undefined) {
+        const levelSpan = document.createElement("span");
+        levelSpan.classList.add("level-right");
+        levelSpan.textContent = `Level: ${competitors[0].level + 1}`;
+        header.appendChild(levelSpan);
+    }
+
+    categoryDiv.appendChild(header);
+
+    let fightResults = {};
+    try {
+        const result = await fetch(`${backendURL}/getCategoryResults/${categoryId}?token=${token}`);
+        const data = await result.json();
+        fightResults = data;
+    } catch (err) {
+        console.error("Błąd pobierania wyników walk:", err);
+    }
+
+    let allMatchesDone = (competitors.length * (competitors.length -1) / 2 == fightResults.length); // flaga sprawdzająca, czy wszystkie walki zakończone
+
+    for (let i = 0; i < competitors.length; i++) {
+        for (let j = i + 1; j < competitors.length; j++) {
+            const rowDiv = document.createElement("div");
+            rowDiv.classList.add("fight-row");
+
+            const leftSpan = document.createElement("span");
+            leftSpan.classList.add("fighter");
+            leftSpan.textContent = `${competitors[i].name} ${competitors[i].surname}`;
+
+            const separatorSpan = document.createElement("span");
+            separatorSpan.classList.add("separator");
+            separatorSpan.textContent = "vs";
+
+            const rightSpan = document.createElement("span");
+            rightSpan.classList.add("fighter");
+            rightSpan.textContent = `${competitors[j].name} ${competitors[j].surname}`;
+
+            rowDiv.appendChild(leftSpan);
+            rowDiv.appendChild(separatorSpan);
+            rowDiv.appendChild(rightSpan);
+
+            let Szukaj = fightResults.filter(fightResult => {
+                return competitors[i].id == fightResult.winner_id || competitors[i].id == fightResult.loser_id
+            });
+
+            Szukaj = Szukaj.filter(fightResult => {
+                return competitors[j].id == fightResult.winner_id || competitors[j].id == fightResult.loser_id
+            });
+
+            const matchDone = Szukaj.length>0;
+            if(matchDone){
+                rowDiv.classList.add("Walczył");
+            }else{
+                rowDiv.classList.remove("Walczył");
+                console.log("chuj");
+            }
+
+
+            let clickedOnce = false;
+
+            rowDiv.addEventListener("click", () => {
+                if (matchDone) {
+                    if (confirm("Ta walka już się rozegrała. Czy na pewno chcesz ją powtórzyć?")) {
+                        window.location.href = `/zegar?id1=${competitors[i].id}&id2=${competitors[j].id}&category=${categoryId}`;
+                    }
+                } else {
+                    window.location.href = `/zegar?id1=${competitors[i].id}&id2=${competitors[j].id}&category=${categoryId}`;
+                }
+            });
+
+            categoryDiv.appendChild(rowDiv);
+        }
+    }
+
+    // jeśli wszystkie walki zakończone, dodaj przycisk "Zakończ grupę"
+    if (allMatchesDone) {
+        const endBtn = document.createElement("button");
+        endBtn.textContent = "Zakończ grupę";
+        endBtn.style.backgroundColor = "var(--highlight)";
+        endBtn.style.color = "var(--text-active)";
+        endBtn.style.marginTop = "10px";
+        endBtn.addEventListener("click", async () => {
+            try {
+                const response = await fetch(`${backendURL}/endCategory`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ token: token, category_id: categoryId })
+                });
+
+                if (response.status === 400) {
+                    alert("Nie można zakończyć grupy – musisz najpierw rozegrać wszystkie walki.");
+                } else if (response.ok) {
+                    location.reload(); // przeładowanie strony po sukcesie
+                } else {
+                    alert("Wystąpił błąd przy zakończeniu grupy.");
+                }
+            } catch (err) {
+                console.error("Błąd wysyłania requestu:", err);
+            }
+        });
+        categoryDiv.appendChild(endBtn);
+    }
+
+    listDiv.appendChild(categoryDiv);
+}
+
+
+
+//           Guzik Zawołąj
+
+butZawolaj.addEventListener("click", async() => {
+    const request = await fetch(`${backendURL}/callCompetitors`,{
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            token: token,
+            matNumber: tableNumber,
+            competitors: Zawodnicy
+        })
+    })
+    if(request.ok){
+        alert("Zawołanie wysłane");
+        butZawolaj.disabled=true;
+        butZawolaj.classList.add("martwy");
+        setTimeout(()=> {
+            butZawolaj.disabled=false;
+            butZawolaj.classList.remove("martwy");
+        },20000);
+    }else{
+        alert("Błąd zawołania");
+    }
+});
+
+//          Pobieranie danych
+
+fetch(`${backendURL}/getGroups/?tableNumber=${tableNumber}&token=${token}`)
+    .then(odp => odp.json())
+    .then(async (data) => {
+        const [idFirst, idSecound] = data;
+
+            await fetch(`${backendURL}/getCategory/${idFirst}?token=${token}`)
+                .then(odp => odp.json())
+                .then(data => {
+                    fillTable("TableFirst", idFirst, data);
+                    fillList(idFirst, data);
+                })
+                .catch(err => {
+                    console.error(`Błąd kategorie ${idFirst}`, err);
+                });
+
+            await fetch(`${backendURL}/getCategory/${idSecound}?token=${token}`)
+                .then(odp => odp.json())
+                .then(data => {
+                    fillTable("TableSecound", idSecound, data);
+                    fillList(idSecound, data);
+                })
+                .catch(err => {
+                    console.error(`Błąd kategorie ${idSecound}`, err);
+                });
+
+    })
+    .catch(err => {
+        console.error("Błąd grupy", err);
+    });
+
+

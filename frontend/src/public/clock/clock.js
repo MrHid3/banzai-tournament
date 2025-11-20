@@ -67,7 +67,7 @@ async function fetchSingleCompetitor(id) {
   const urlParams = new URLSearchParams(window.location.search);
 
   try {
-    const response = await fetch(`http://localhost:3000/getCompetitor/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`);
+    const response = await fetch(`${backendURL}/getCompetitor/${id}?token=${token}`);
     if (!response.ok) throw new Error(`Błąd pobierania zawodnika ${id}: ${response.status}`);
     const data = await response.json();
     return Array.isArray(data) ? data[0] : data;
@@ -82,6 +82,8 @@ async function fetchCompetitors() {
   const id1 = urlParams.get("id1");
   const id2 = urlParams.get("id2");
 
+console.log(id1,id2);
+
   if (id1 && id2) {
     const [competitorA, competitorB] = await Promise.all([
       fetchSingleCompetitor(id1),
@@ -95,19 +97,17 @@ async function fetchCompetitors() {
     return competitors;
   }
 
-  if (token) {
-    try {
-      const response = await fetch(`http://localhost:3000/getCompetitor/${encodeURIComponent(token)}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error(`Błąd pobierania zawodników: ${response.status}`);
-      const competitors = await response.json();
-      return Array.isArray(competitors) ? competitors : [];
-    } catch (error) {
-      console.error("Błąd pobierania zawodników (token):", error);
-      return [];
-    }
-  }
+  // if (token) {
+  //   try {
+  //     const response = await fetch(`${backendURL}/getCompetitor/${id}?token=${token}`);
+  //     if (!response.ok) throw new Error(`Błąd pobierania zawodników: ${response.status}`);
+  //     const competitors = await response.json();
+  //     return Array.isArray(competitors) ? competitors : [];
+  //   } catch (error) {
+  //     console.error("Błąd pobierania zawodników (token):", error);
+  //     return [];
+  //   }
+  // }
 
   console.error("Brak tokena ani id1/id2 w adresie URL!");
   return [];
@@ -220,7 +220,7 @@ async function sendFightResult() {
   getElement("sendStatus").textContent = "⏳ Wysyłanie...";
 
   try {
-    const response = await fetch("http://localhost:3000/saveFightResults", {
+    const response = await fetch(`${backendURL}/saveFightResults`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
