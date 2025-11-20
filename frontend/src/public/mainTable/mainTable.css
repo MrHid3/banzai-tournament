@@ -6,6 +6,18 @@
     width: 80%;
     margin: 30px auto 0 auto;
     height: 80vh;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0px 0px 1px rgba(3, 7, 18, 0.02),
+    0px 1px 4px rgba(3, 7, 18, 0.05),
+    0px 2px 10px rgba(3, 7, 18, 0.07),
+    0px 3px 17px rgba(3, 7, 18, 0.10),
+    0px 4px 27px rgba(3, 7, 18, 0.12),
+    0px 6px 39px rgba(3, 7, 18, 0.14),
+    0px 8px 52px rgba(3, 7, 18, 0.17),
+    0px 11px 68px rgba(3, 7, 18, 0.19),
+    0px 14px 87px rgba(3, 7, 18, 0.22),
+    0px 17px 107px rgba(3, 7, 18, 0.24);
+
 }
 
 #main > *{
@@ -25,6 +37,14 @@ h1{
     height: 50px;
 }
 
+#callContainer{
+    border-radius: 10px 0 0 0;
+}
+
+#awardsContainer{
+    border-radius: 0 10px 0 0;
+}
+
 #callContainer h1{
     border-width: 2px 0 2px 2px;
     border-radius: 10px 0 0 0;
@@ -42,6 +62,7 @@ h1{
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 #calls::-webkit-scrollbar, #awards::-webkit-scrollbar {
@@ -57,35 +78,48 @@ h1{
 
 #calls{
     border-width: 0 1px 0 0;
+    padding-top: 20px;
 }
 
 #awards{
     border-width: 0 0 0 1px;
+    padding-top: 20px;
 }
 
 .awardContainer, .callContainer{
-    color: var(--text-inactive);
+    /*color: var(--bg-primary);*/
     display: flex;
     flex-direction: column;
     gap: 5px;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: var(--bg-secondary);
     /*border-radius: 15px;*/
     padding: 10px;
     margin: 10px auto;
-    border: 2px solid var(--bg-action);
+    border: 5px solid var(--highlight);
     width: fit-content;
     max-width: 90%;
     position: relative;
+    border-width: 0 2px 2px 2px;
+    animation: create 0.3s ease-in-out;
+    transition-duration: 0.2s;
+    box-shadow: 0px 0px 1px rgba(3, 7, 18, 0.02),
+    0px 1px 4px rgba(3, 7, 18, 0.05),
+    0px 2px 10px rgba(3, 7, 18, 0.07),
+    0px 3px 17px rgba(3, 7, 18, 0.10),
+    0px 4px 27px rgba(3, 7, 18, 0.12),
+    0px 6px 39px rgba(3, 7, 18, 0.14),
+    0px 8px 52px rgba(3, 7, 18, 0.17),
+    0px 11px 68px rgba(3, 7, 18, 0.19),
+    0px 14px 87px rgba(3, 7, 18, 0.22),
+    0px 17px 107px rgba(3, 7, 18, 0.24);
 }
 
 .awardContainer{
     border-radius: 5px 10px 10px 5px;
-    border-width: 1px 0 1px 0;
 }
 
 .callContainer{
     border-radius: 10px 5px 5px 10px;
-    border-width: 1px 0 1px 0;
 }
 
 .awardContainer p, .callContainer p{
@@ -133,21 +167,43 @@ h1{
     cursor: pointer;
 }
 
-/*.dissapear{*/
-/*    animation: delete 0.5s linear;*/
-/*    height: 0;*/
-/*    overflow: hidden;*/
-/*    padding: 0;*/
-/*    display: none;*/
-/*}*/
-/**/
-/*@keyframes delete{*/
-/*    from{*/
-/*        height: 100%;*/
-/*        display: block;*/
-/*    }to{*/
-/*    height: 0;*/
-/*    display: none;*/
-/*    margin: 0;*/
-/*         }*/
-/*}*/
+.magic{
+    animation: delete 0.2s ease-in-out;
+    transition-duration: 0.2s;
+    /*height: 0;*/
+    height: 0;
+    padding: 0;
+    margin: 0 auto;
+    width: 80%;
+    overflow: hidden;
+}
+
+.absent{
+    text-decoration: line-through;
+    text-decoration-color: var(--text-active);
+}
+
+@keyframes delete{
+    from{
+        height: 200px;
+    }to{
+        height: 0;
+        width: 20%;
+    }
+}
+
+@keyframes create{
+    from{
+        width: 10%;
+        overflow: hidden;
+        color: transparent;
+        height: 10px;
+        margin-top: 200px;
+    }to{
+        width: 80%;
+        height: 200px;
+        overflow: hidden;
+        color: var(--text-inactive);
+        margin-top: 10px;
+    }
+}

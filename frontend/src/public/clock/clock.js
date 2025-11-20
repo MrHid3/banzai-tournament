@@ -82,8 +82,6 @@ async function fetchCompetitors() {
   const id1 = urlParams.get("id1");
   const id2 = urlParams.get("id2");
 
-console.log(id1,id2);
-
   if (id1 && id2) {
     const [competitorA, competitorB] = await Promise.all([
       fetchSingleCompetitor(id1),

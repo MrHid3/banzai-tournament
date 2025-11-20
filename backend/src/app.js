@@ -52,14 +52,13 @@ App.use(express.json());
 App.use(express.urlencoded({ extended: true }));
 App.use(express.static(path.join(__dirname, 'public')));
 
-async function initDB(){
-    // await pool.query("DROP TABLE IF EXISTS fightResults; DROP TABLE IF EXISTS competitors; DROP TABLE IF EXISTS categories");
-    await pool.query("CREATE TABLE IF NOT EXISTS categories(" +
+// await pool.query("DROP TABLE IF EXISTS tables; DROP TABLE IF EXISTS fightResults; DROP TABLE IF EXISTS competitors; DROP TABLE IF EXISTS categories");
+await pool.query("CREATE TABLE IF NOT EXISTS categories(" +
         "id integer primary key," +
         "level integer," +
         "half integer," +
-        "played_out boolean)")
-    await pool.query("CREATE TABLE IF NOT EXISTS competitors(" +
+        "played_out boolean);" +
+    "CREATE TABLE IF NOT EXISTS competitors(" +
         "id serial primary key," +
         "name varchar," +
         "surname varchar," +
@@ -67,32 +66,41 @@ async function initDB(){
         "weight numeric(4, 1)," +
         "level integer," +
         "location varchar," +
-        "category_id integer references categories(id))")
-    await pool.query("CREATE table IF NOT EXISTS fightResults(" +
+        "category_id integer references categories(id)," +
+        "place integer," +
+        "is_name_duplicate boolean);" +
+    "CREATE table IF NOT EXISTS fightResults(" +
         "category_id integer references categories(id)," +
         "winner_id integer references competitors(id)," +
         "winner_points integer," +
         "loser_id integer references competitors(id)," +
         "loser_points integer," +
-        "reason varchar)")
-    await pool.query("CREATE table IF NOT EXISTS config(" +
+        "reason varchar);" +
+    "CREATE table IF NOT EXISTS config(" +
         "key varchar primary key," +
-        "value varchar)")
-    await pool.query("CREATE table IF NOT EXISTS tables(" +
+        "value varchar);" +
+    "CREATE table IF NOT EXISTS tables(" +
         "table_number int," +
-        "category_id int references categories(id) primary key)")
-    await pool.query("INSERT INTO config (key, value) values ('half', '1') ON CONFLICT (key) DO NOTHING")
-    await pool.query("INSERT INTO config (key, value) values ('numberOfTables', '5') ON CONFLICT (key) DO NOTHING")
-}
+        "category_id int references categories(id) primary key);" +
+    "INSERT INTO config (key, value) values ('half', '1') ON CONFLICT (key) DO NOTHING;" +
+    "INSERT INTO config (key, value) values ('numberOfTables', '5') ON CONFLICT (key) DO NOTHING;" +
+    "CREATE OR REPLACE PROCEDURE update_duplicates(r_name varchar, r_surname varchar) " +
+    "LANGUAGE plpgsql " +
+    "AS $$ " +
+    "BEGIN " +
+    "   UPDATE competitors" +
+    "   SET is_name_duplicate = " +
+    "   ((SELECT COUNT(1) FROM competitors WHERE name = r_name AND surname = r_surname) > 1)" +
+    "   WHERE name = r_name AND surname = r_surname;" +
+    "END; " +
+    "$$;")
 
-await initDB();
-
-let currentHalf, numberOfTables;
+let config = {};
 async function loadConfig(){
-    currentHalf = (await pool.query("SELECT value FROM config WHERE key = 'half'")).rows[0].value
-    numberOfTables = (await pool.query("SELECT value FROM config WHERE key = 'numberOfTables'")).rows[0].value
+    (await pool.query("SELECT key, value FROM config")).rows.forEach(async (row) => {
+        config[row.key] = row.value;
+    })
 }
-
 await loadConfig();
 
 function authenticateToken(req, res, next){
@@ -192,8 +200,9 @@ App.post('/addCompetitors', authenticateToken, authenticateAdder, authenticateAd
                 exists
             } = competitor;
             if(exists){
-                await pool.query("INSERT INTO competitors (name, surname, age, weight, level, location) VALUES ($1, $2, $3, $4, $5, $6)",
+                await pool.query("INSERT INTO competitors (name, surname, age, weight, level, location) VALUES ($1, $2, $3, $4, $5, $6);",
                     [name, surname, age, weight, level, location]);
+                await pool.query("CALL update_duplicates($1, $2)", [name, surname]);
             }
         }
         const IDs = await pool.query("SELECT id FROM competitors")
@@ -208,20 +217,29 @@ App.post('/addCompetitors', authenticateToken, authenticateAdder, authenticateAd
             && IDarray.includes(id)))
                 continue;
             if(name === "remove"){
+                const data = (await pool.query("SELECT name, surname FROM competitors WHERE id = $1", [id])).rows[0];
                 await pool.query('DELETE FROM competitors WHERE id = $1', [id]);
+                await pool.query('CALL update_duplicates($1, $2)', [data.name, data.surname])
             }else{
-                await pool.query(`UPDATE competitors SET ${name}= $1 WHERE id = $2`, [value, id])
+                const dataOld = (await pool.query("SELECT name, surname FROM competitors WHERE id = $1", [id])).rows[0];
+                await pool.query(`UPDATE competitors SET ${name}= $1 WHERE id = $2`, [value, id]);
+                if(name === "name" || name === "surname"){
+                    const data = (await pool.query("SELECT name, surname FROM competitors WHERE id = $1", [id])).rows[0];
+                    await pool.query('CALL update_duplicates($1, $2)', [data.name, data.surname]);
+                    await pool.query('CALL update_duplicates($1, $2)', [dataOld.name, dataOld.surname]);
+                }
             }
         }
         res.sendStatus(200);
     }catch(error){
+        console.log(error)
         res.sendStatus(500);
     }
 })
 
 App.get('/getCompetitors', authenticateToken, async (req, res) => {
     try{
-        const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location, category_id FROM competitors");
+        const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location, place, category_id, is_name_duplicate FROM competitors ORDER BY id ASC");
         res.send(getCompetitorsQuery.rows);
     }catch(error){
         res.sendStatus(500);
@@ -230,7 +248,7 @@ App.get('/getCompetitors', authenticateToken, async (req, res) => {
 
 App.get("/getCompetitor/:id", authenticateToken, async (req, res) => {
     try{
-        const getCompetitorQuery = await pool.query("SELECT id, name, surname, location, category_id FROM competitors WHERE id = $1", [req.params.id]);
+        const getCompetitorQuery = await pool.query("SELECT id, name, surname, age, weight, level, location, category_id, place, is_name_duplicate FROM competitors WHERE id = $1 ORDER BY id ASC", [req.params.id]);
         res.send(getCompetitorQuery.rows);
     }catch(error){
         console.log(error);
@@ -240,7 +258,7 @@ App.get("/getCompetitor/:id", authenticateToken, async (req, res) => {
 
 App.get("/getCompetitors/school/:school", authenticateToken, async (req, res) => {
     try{
-        const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, category_id FROM competitors WHERE location=$1", [req.params.school]);
+        const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, category_id, is_name_duplicate FROM competitors WHERE location=$1 ORDER BY id ASC", [req.params.school]);
         res.send(getCompetitorsQuery.rows);
     }catch(error){
         console.log(error);
@@ -249,25 +267,6 @@ App.get("/getCompetitors/school/:school", authenticateToken, async (req, res) =>
 })
 
 App.get("/getCategories", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
-    /*
-    * [
-    *   {
-    *       kategorie: int
-    *       level: int
-    *       zawodnicy: [
-    *           {
-    *               id: int
-    *               name: string
-    *               surname: string
-    *               age: int
-    *               weight: float
-    *               level: int
-    *               location: string
-    *           }, ...
-    *       ]
-    *   }, ...
-    *]
-    * */
     try{
         const categoriesQuery = await pool.query("SELECT DISTINCT(ca.id), ca.level, ca.half FROM categories ca RIGHT JOIN competitors co ON co.category_id = ca.id WHERE ca.ID IS NOT NULL ORDER BY ca.id ASC")
         let result = [];
@@ -385,8 +384,8 @@ App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, 
         const tableNumber = req.query.tableNumber;
         const currentCategories = await pool.query("SELECT category_id FROM tables WHERE table_number = $1", [tableNumber]);
         let categories;
-        if (currentCategories.rows.length == 0) {
-            categories = (await pool.query("SELECT id FROM categories WHERE half = $1 AND played_out IS FALSE ORDER BY id ASC LIMIT 2", [currentHalf])).rows.map(c => c.id);
+        if (currentCategories.rows.length === 0) {
+            categories = (await pool.query("SELECT id FROM categories WHERE half = $1 AND played_out IS FALSE ORDER BY id ASC LIMIT 2 AND category_id NOT IN (SELECT category_id FROM tables)", [config.half])).rows.map(c => c.id);
             categories.forEach(async (category) => {
                 await pool.query("INSERT INTO tables (table_number, category_id) values ($1, $2)", [tableNumber, category])
             })
@@ -403,8 +402,9 @@ App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, 
 App.post("/callCompetitors", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
         const {competitors, matNumber} = req.body;
-        const competitorsQuery = await pool.query("SELECT name, surname FROM competitors WHERE id = ANY($1::int[])", [competitors])
-        io.sockets.emit("call", {matNumber: matNumber , competitors: competitorsQuery.rows});
+        let competitorsQ = (await pool.query("SELECT name, surname, location, is_name_duplicate FROM competitors WHERE id = ANY($1::int[])", [competitors])).rows;
+        competitorsQ.forEach(c => {if(!c.is_name_duplicate) delete c.location; delete c.is_name_duplicate});
+        io.sockets.emit("call", {matNumber: matNumber , competitors: competitorsQ});
         res.sendStatus(200);
     }catch(error){
         console.log(error);
@@ -415,40 +415,47 @@ App.post("/callCompetitors", authenticateToken, authenticateReferee, authenticat
 App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
         const {category_id} = req.body;
-        await pool.query("DELETE FROM tables WHERE category_id = $1", [category_id]);
-        await pool.query("UPDATE categories SET played_out = TRUE WHERE id = $1", [category_id]);
-        const competitors = (await pool.query("SELECT id, name, surname, location FROM competitors WHERE category_id = $1", [category_id])).rows;
         const fights = (await pool.query("SELECT * FROM fightResults WHERE category_id = $1", [category_id])).rows;
+        const competitors = (await pool.query("SELECT id, name, surname, location, is_name_duplicate FROM competitors WHERE category_id = $1", [category_id])).rows;
         if(fights.length < competitors.length * (competitors.length - 1) / 2){
             res.sendStatus(400);
             return;
         }
+        await pool.query("DELETE FROM tables WHERE category_id = $1", [category_id]);
+        await pool.query("UPDATE categories SET played_out = TRUE WHERE id = $1", [category_id]);
         for(let competitor of competitors){
             competitor.wins = {};
             competitor.points = 0;
+            competitor.noShow = 0;
             for(let fight of fights){
+                if(((fight.winner_id === competitor.id || fight.loser_id === competitor.id) && fight.reason === "default") || (fight.loser_id === competitor.id && fight.reason === "walkover"))
+                    competitor.noShow++;
                 if(fight.winner_id === competitor.id && fight.reason !== "default"){
                     competitor.wins[fight.loser_id] = true;
                     competitor.points += fight.winner_points;
-                    if(fight.reason === "tap")
+                    if(fight.reason == "tap")
                         competitor.points += 99;
                 }
                 if(fight.loser_id === competitor.id)
                     competitor.points += fight.loser_points;
             }
         }
+        competitors.sort((a,b) => b.points - a.points);
+        competitors.sort((a,b) => a.noShow - b.noShow);
         competitors.sort((a, b) => {
-            if(a.wins[b.id]) return -1;
-            if(b.wins[a.id]) return 1;
-            return(b.points - a.points);
+            if(Object.keys(a.wins).length === Object.keys(b.wins).length){
+                if(a.wins[b.id]) return -1;
+                if(b.wins[a.id]) return 1;
+            }
+            return Object.keys(b.wins).length - Object.keys(a.wins).length;
         })
         for(let i in competitors){
             if(i == 0){
                 competitors[i].place = 1;
             } else if(competitors[i - 1].place == 3){
                 competitors[i].place = 3;
-            } else if (competitors[i - 1].points === competitors[i].points){
-                competitors[i].place = competitors[i -1 ].place;
+            // } else if (competitors[i - 1].points === competitors[i].points){
+            //     competitors[i].place = competitors[i - 1].place;
             } else {
                 competitors[i].place = competitors[i - 1].place + 1;
             }
@@ -456,55 +463,21 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
         for(let c of competitors){
             delete c.points;
             delete c.wins;
-            delete c.location;
+            if(!c.is_name_duplicate)
+                delete c.location;
+            delete c.is_name_duplicate;
+            await pool.query("UPDATE competitors SET place = $1 WHERE id = $2", [c.place, c.id]);
+            if(c.noShow === competitors.length - 1)
+                c.absent = true;
+            delete c.noShow;
         }
+        // competitors.filter((c) => c.default);
         io.sockets.emit("award", {category: category_id, competitors: competitors})
         res.sendStatus(200);
     }catch(error){
         console.log(error);
         res.sendStatus(500);
     }
-})
-
-io.on("connection", socket => {
-    // for(let i = 0; i < 10; i++)
-    // socket.emit("award", {category: 1, competitors: [
-    //         {
-    //             name: "bobaaaaaaaaaaaaaaaaa",
-    //             surname: "odenkirk",
-    //             school: "spnr1",
-    //             place: 1
-    //         }, {
-    //             name: "waaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaalter",
-    //             surname: "whities",
-    //             place: 2
-    //         }, {
-    //             name: "kim",
-    //             surname: "sexler",
-    //             place: 3
-    //         }, {
-    //             name: "jesse",
-    //             surname: "gayman",
-    //             place: 4
-    //         }
-    //     ]})
-    // for(let i = 0; i < 10; i++)
-    // socket.emit("call", {mat: 1, competitors: [
-    //         {
-    //             name: "bobaaaaaaaaaaaaaaaaa",
-    //             surname: "odenkirk",
-    //             school: "spnr1",
-    //         }, {
-    //             name: "aaaaaaalter",
-    //             surname: "whities",
-    //         }, {
-    //             name: "kim",
-    //             surname: "sexler",
-    //         }, {
-    //             name: "jesse",
-    //             surname: "gayman",
-    //         }
-    //     ]})
 })
 
 server.listen(3000, () => {

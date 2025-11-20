@@ -13,10 +13,10 @@ const competitorsTable = document.querySelector("#competitors-table");
 const saveButton = document.querySelector("#send-button");
 const addCompetitorButton = document.querySelector("#add-competitor-button");
 const searchCompetitorInput = document.querySelector("#search-competitor-input");
-const goBackButton = document.querySelector("#goBack");
 const logoutButton = document.querySelector("#logout");
 const resetButton = document.querySelector("#reset-button");
 const token = localStorage.getItem('token');
+let passCheck = false;
 
 try{
     locations.forEach(location => {
@@ -44,6 +44,7 @@ if(localStorage.getItem("location") != null){
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
         competitor.exists = true;
         delete competitor.category_id;
+        delete competitor.is_name_duplicate;
     })
     addCompetitorButton.style.display = "block";
     locationSelect.classList.remove("before-location");
@@ -52,28 +53,9 @@ if(localStorage.getItem("location") != null){
     resetButton.classList.remove("hidden");
 }
 
-goBackButton.addEventListener("click", (e) => {
-    if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
-        if(!confirm("Jesteś pewny? Masz niezapisane zmiany")){
-            e.preventDefault()
-        }
-    }
-})
-
-logoutButton.addEventListener("click", (e) => {
-    if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
-        if(!confirm("Jesteś pewny? Masz niezapisane zmiany")){
-            e.preventDefault()
-        }
-    }
-})
-
 resetButton.addEventListener("click", (e) => {
-    if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
-        if(confirm("Jesteś pewny? Niezapisane zmiany zostaną utracone")){
-           window.location.reload();
-        }
-    }
+    passCheck = true;
+    window.location.reload();
 })
 
 locationSelect.addEventListener("change", async () => {
@@ -82,9 +64,8 @@ locationSelect.addEventListener("change", async () => {
         addCompetitorButton.style.display = "block";
         locationSelect.classList.remove("before-location");
         saveButton.classList.remove("hidden");
+        searchCompetitorInput.classList.remove("hidden")
     } else if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
-        console.log(competitors);
-        console.log(locationCompetitors);
         if(!confirm("Jesteś pewny? Masz niezapisane zmiany")){
             locationSelect.value = previousLocation;
             return;
@@ -100,6 +81,7 @@ locationSelect.addEventListener("change", async () => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
         competitor.exists = true;
         delete competitor.category_id;
+        delete competitor.is_name_duplicate;
     })
     previousLocation = locationSelect.value;
     localStorage.setItem("location", locationSelect.value);
@@ -265,6 +247,7 @@ async function save(){
             })
         })
         if(res.status === 200){
+            passCheck = true;
             window.location.reload();
         }else if(res.status === 500){
             alert("Coś poszło nie tak. Spróbuj ponownie później");
@@ -282,3 +265,9 @@ function searchCompetitor(text){
    setTimeout( () => matching.classList.remove("filet"), 1000)
 }
 searchCompetitorInput.addEventListener("change", (e) => searchCompetitor(e.target.value));
+
+window.addEventListener('beforeunload', function(event) {
+    if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))
+        && !passCheck)
+            event.returnValue = 'You have unsaved changes!';
+});
