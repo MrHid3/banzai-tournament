@@ -239,7 +239,7 @@ App.post('/addCompetitors', authenticateToken, authenticateAdder, authenticateAd
 
 App.get('/getCompetitors', authenticateToken, async (req, res) => {
     try{
-        const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location, category_id, is_name_duplicate FROM competitors");
+        const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location, place, category_id, is_name_duplicate FROM competitors ORDER BY id ASC");
         res.send(getCompetitorsQuery.rows);
     }catch(error){
         res.sendStatus(500);
@@ -248,7 +248,7 @@ App.get('/getCompetitors', authenticateToken, async (req, res) => {
 
 App.get("/getCompetitor/:id", authenticateToken, async (req, res) => {
     try{
-        const getCompetitorQuery = await pool.query("SELECT id, name, surname, location, category_id, is_name_duplicate FROM competitors WHERE id = $1", [req.params.id]);
+        const getCompetitorQuery = await pool.query("SELECT id, name, surname, age, weight, level, location, category_id, place, is_name_duplicate FROM competitors WHERE id = $1 ORDER BY id ASC", [req.params.id]);
         res.send(getCompetitorQuery.rows);
     }catch(error){
         console.log(error);
@@ -258,7 +258,7 @@ App.get("/getCompetitor/:id", authenticateToken, async (req, res) => {
 
 App.get("/getCompetitors/school/:school", authenticateToken, async (req, res) => {
     try{
-        const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, category_id, is_name_duplicate FROM competitors WHERE location=$1", [req.params.school]);
+        const getCompetitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, category_id, is_name_duplicate FROM competitors WHERE location=$1 ORDER BY id ASC", [req.params.school]);
         res.send(getCompetitorsQuery.rows);
     }catch(error){
         console.log(error);
@@ -426,9 +426,10 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
         for(let competitor of competitors){
             competitor.wins = {};
             competitor.points = 0;
+            competitor.noShow = 0;
             for(let fight of fights){
-                // if((fight.winner_id === competitor.id || fight.loser_id === competitor.id) && fight.reason === "default")
-                //     competitor.default = true;
+                if(((fight.winner_id === competitor.id || fight.loser_id === competitor.id) && fight.reason === "default") || (fight.loser_id === competitor.id && fight.reason === "walkover"))
+                    competitor.noShow++;
                 if(fight.winner_id === competitor.id && fight.reason !== "default"){
                     competitor.wins[fight.loser_id] = true;
                     competitor.points += fight.winner_points;
@@ -439,22 +440,22 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
                     competitor.points += fight.loser_points;
             }
         }
-        competitors.sort((a,b) => a.points - b.points);
+        competitors.sort((a,b) => b.points - a.points);
+        competitors.sort((a,b) => a.noShow - b.noShow);
         competitors.sort((a, b) => {
-            // if(a.default) return -1;
-            // if(b.default) return 1;
             if(Object.keys(a.wins).length === Object.keys(b.wins).length){
                 if(a.wins[b.id]) return -1;
                 if(b.wins[a.id]) return 1;
             }
+            return Object.keys(b.wins).length - Object.keys(a.wins).length;
         })
         for(let i in competitors){
             if(i == 0){
                 competitors[i].place = 1;
             } else if(competitors[i - 1].place == 3){
                 competitors[i].place = 3;
-            } else if (competitors[i - 1].points === competitors[i].points){
-                competitors[i].place = competitors[i - 1].place;
+            // } else if (competitors[i - 1].points === competitors[i].points){
+            //     competitors[i].place = competitors[i - 1].place;
             } else {
                 competitors[i].place = competitors[i - 1].place + 1;
             }
@@ -466,6 +467,9 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
                 delete c.location;
             delete c.is_name_duplicate;
             await pool.query("UPDATE competitors SET place = $1 WHERE id = $2", [c.place, c.id]);
+            if(c.noShow === competitors.length - 1)
+                c.absent = true;
+            delete c.noShow;
         }
         // competitors.filter((c) => c.default);
         io.sockets.emit("award", {category: category_id, competitors: competitors})

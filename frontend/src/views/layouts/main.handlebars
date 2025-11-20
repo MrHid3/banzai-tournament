@@ -9,12 +9,22 @@
     <style>
         {{#if menu}}
             #logout {
-                border-radius: 5px;
+                border-radius: 0 0 5px 5px;
+            }
+            #logout:hover {
+                padding-left: 30px;
+                padding-right: 30px;
             }
         {{else}}
              #logout {
                 border-radius: 0 0 5px 0;
             }
+             #logout:hover {
+                 padding: 5px 20px;
+             }
+             #main-header:has(#logout:hover) #goBack{
+                 margin-left: 20px;
+             }
         {{/if}}
     </style>
 </head>

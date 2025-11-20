@@ -22,6 +22,8 @@ socket.on("award", (data) => {
         const competitor = document.createElement("p");
         competitor.classList.add("competitor");
         competitor.innerText = `${data.competitors[i].place} miejsce - ${data.competitors[i].name} ${data.competitors[i].surname} ${data.competitors[i].location? "- " + (locations.find(l => l.value = data.competitors[i].location).name) : ""}`;
+        if(data.competitors[i].absent)
+            competitor.classList.add("absent");
         competitorContainer.append(competitor);
     }
     container.appendChild(competitorContainer);

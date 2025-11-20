@@ -36,7 +36,7 @@ App.get('/menu', cors(), (req, res) => {
 })
 
 App.get('/dodawanie', cors(), (req, res) => {
-    res.render("addCompetitors", );
+    res.render("addCompetitors");
 })
 
 App.get("/kategorie", cors(), (req, res) => {
@@ -63,6 +63,10 @@ App.get("/wybierzStolik", cors(), (req, res) => {
 
 App.get("/stolikMaly", cors(), (req, res) => {
     res.render("smallTable");
+})
+
+App.get("/wynikiKategorii", cors(), (req, res) => {
+    res.render("categoryResults");
 })
 
 App.listen(4000, () => {

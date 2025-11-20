@@ -64,6 +64,7 @@ locationSelect.addEventListener("change", async () => {
         addCompetitorButton.style.display = "block";
         locationSelect.classList.remove("before-location");
         saveButton.classList.remove("hidden");
+        searchCompetitorInput.classList.remove("hidden")
     } else if(JSON.stringify(locationCompetitors) !== JSON.stringify(competitors.filter(c => c.exists))){
         if(!confirm("Jesteś pewny? Masz niezapisane zmiany")){
             locationSelect.value = previousLocation;
