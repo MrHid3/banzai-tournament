@@ -69,6 +69,10 @@ App.get("/wynikiKategorii", cors(), (req, res) => {
     res.render("categoryResults");
 })
 
+App.get("/konfiguracja", cors(), (req, res) => {
+    res.render("config");
+})
+
 App.listen(4000, () => {
     console.log(`Frontend is up at ${process.env.FRONTEND_URL}`);
 });

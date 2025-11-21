@@ -1,9 +1,9 @@
 const rolesAccess = {
-    "test": ["adding", "clock", "categories", "mainTable", "test", "smallTable", "chooseTable", "categoryResults"],
+    "test": ["adding", "clock", "categories", "mainTable", "test", "smallTable", "chooseTable", "categoryResults", "config"],
     "adder": ["adding"],
     "bigReferee": ["mainTable"],
     "referee": ["chooseTable", "smallTable", "clock"],
-    "admin": ["categories"],
+    "admin": ["categories", "config", "categoryResults"],
 }
 
 const role = localStorage.getItem("role");

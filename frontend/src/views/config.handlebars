@@ -1,0 +1,21 @@
+<head>
+    <meta charset="UTF-8">
+    <title>Konfiguracja</title>
+    <link rel="stylesheet" href="/config/config.css">
+</head>
+<body>
+<div id="container">
+    <button id="beginButton">ZACZNIJ WALKI</button>
+    <p>Liczba stołów: <span id="numberOnSlider"></span></p>
+    <input type="range" min="1" max="9" value="5" id="tableSlider">
+    <div id="halfContainer">
+        <label for="half">Połowa: </label>
+        <select id="half">
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select>
+    </div>
+    <button id="send">ZAPISZ</button>
+</div>
+<script src="/config/config.js" type="module"></script>
+</body>

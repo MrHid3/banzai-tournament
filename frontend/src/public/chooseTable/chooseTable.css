@@ -34,6 +34,7 @@
     font-size: 10vh;
     font-weight: bold;
     flex-grow: 1;
+    transition-duration: 0.2s;
 }
 
 .tableButton:first-child{

@@ -84,6 +84,7 @@ await pool.query("CREATE TABLE IF NOT EXISTS categories(" +
         "category_id int references categories(id) primary key);" +
     "INSERT INTO config (key, value) values ('half', '1') ON CONFLICT (key) DO NOTHING;" +
     "INSERT INTO config (key, value) values ('numberOfTables', '5') ON CONFLICT (key) DO NOTHING;" +
+    "INSERT INTO config (key, value) values ('fightsEnabled', 0) ON CONFLICT (key) DO NOTHING;" +
     "CREATE OR REPLACE PROCEDURE update_duplicates(r_name varchar, r_surname varchar) " +
     "LANGUAGE plpgsql " +
     "AS $$ " +
@@ -183,6 +184,10 @@ App.post('/verify', authenticateToken, async(req, res) => {
 
 App.post('/addCompetitors', authenticateToken, authenticateAdder, authenticateAdmin, authenticateRole, async (req, res) => {
     try{
+        if(config.fightsEnabled == 1){
+            res.send(400);
+            return;
+        }
         let wrong = [];
         const {
             location,
@@ -303,10 +308,14 @@ App.get("/getCompetitorsWithoutCategories", authenticateToken, authenticateAdmin
 
 App.post("/saveCategories", authenticateToken, authenticateAdmin, authenticateRole, async(req, res) => {
     try{
+        if(config.fightsEnabled == 1){
+            res.send(400);
+            return;
+        }
         await pool.query("UPDATE competitors SET category_id = NULL")
         await pool.query("DELETE FROM categories");
         req.body.categories.forEach(async (category) => {
-            const parametersQuery = await pool.query("SELECT level, age FROM competitors WHERE id = $1 LIMIT 1", [category.zawodnicy[0]]);
+            const parametersQuery = await pool.query("SELECT level, age FROM competitors WHERE id = ANY($1::int[]) ORDER BY age ASC LIMIT 1", [category.zawodnicy]);
             await pool.query("INSERT INTO categories(id, level, half, played_out) VALUES ($1, $2, $3, $4)", [category.kategoria, parametersQuery.rows[0].level, parametersQuery.rows[0].age <= 10 ? 1 : 2, false])
             await pool.query("UPDATE competitors SET category_id = $1 WHERE id = ANY($2::int[]) AND level = $3", [category.kategoria, category.zawodnicy, parametersQuery.rows[0].level])
         })
@@ -319,6 +328,10 @@ App.post("/saveCategories", authenticateToken, authenticateAdmin, authenticateRo
 
 App.post("/saveFightResults", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
+        if(config.fightsEnabled == 0){
+            res.send(400);
+            return;
+        }
         const {
             winner_ID,
             winner_points,
@@ -401,6 +414,10 @@ App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, 
 
 App.post("/callCompetitors", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
+        if(config.fightsEnabled == 0){
+            res.send(400);
+            return;
+        }
         const {competitors, matNumber} = req.body;
         let competitorsQ = (await pool.query("SELECT name, surname, location, is_name_duplicate FROM competitors WHERE id = ANY($1::int[])", [competitors])).rows;
         competitorsQ.forEach(c => {if(!c.is_name_duplicate) delete c.location; delete c.is_name_duplicate});
@@ -414,6 +431,10 @@ App.post("/callCompetitors", authenticateToken, authenticateReferee, authenticat
 
 App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
+        if(config.fightsEnabled == 0){
+            res.send(400);
+            return;
+        }
         const {category_id} = req.body;
         const fights = (await pool.query("SELECT * FROM fightResults WHERE category_id = $1", [category_id])).rows;
         const competitors = (await pool.query("SELECT id, name, surname, location, is_name_duplicate FROM competitors WHERE category_id = $1", [category_id])).rows;
@@ -477,6 +498,28 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
     }catch(error){
         console.log(error);
         res.sendStatus(500);
+    }
+})
+
+App.post("/config", authenticateToken, authenticateReferee, authenticateRole, async(req, res) => {
+    try{
+        const {key, value} = req.body;
+        await pool.query("UPDATE config SET value = $1 WHERE key = $2", [value, key]);
+        config[key] = value;
+        res.send(200)
+    }catch(error){
+        console.log(error);
+        res.sendStaus(500)
+    }
+})
+
+App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, async(req, res) => {
+    try{
+        const query = (await pool.query("SELECT key, value FROM config")).rows;
+        res.send(query);
+    }catch(error){
+        console.log(error);
+        res.send(500);
     }
 })
 

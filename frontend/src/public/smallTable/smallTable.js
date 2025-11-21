@@ -23,7 +23,6 @@ function fillTable(tableId, categoryId, competitors){
 
     const tbody = table.querySelector("tbody");
     tbody.innerHTML ="";
-    console.log(competitors);
     competitors.forEach(tab => {
         const tr = document.createElement("tr");
 
@@ -115,7 +114,6 @@ async function fillList(categoryId, competitors) {
                 rowDiv.classList.add("Walczył");
             }else{
                 rowDiv.classList.remove("Walczył");
-                console.log("chuj");
             }
 
 
@@ -204,7 +202,7 @@ fetch(`${backendURL}/getGroups/?tableNumber=${tableNumber}&token=${token}`)
     .then(odp => odp.json())
     .then(async (data) => {
         const [idFirst, idSecound] = data;
-
+        if(idFirst)
             await fetch(`${backendURL}/getCategory/${idFirst}?token=${token}`)
                 .then(odp => odp.json())
                 .then(data => {
@@ -214,7 +212,7 @@ fetch(`${backendURL}/getGroups/?tableNumber=${tableNumber}&token=${token}`)
                 .catch(err => {
                     console.error(`Błąd kategorie ${idFirst}`, err);
                 });
-
+        if(idSecound)
             await fetch(`${backendURL}/getCategory/${idSecound}?token=${token}`)
                 .then(odp => odp.json())
                 .then(data => {
