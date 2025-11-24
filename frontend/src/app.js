@@ -36,37 +36,37 @@ App.get('/menu', cors(), (req, res) => {
 })
 
 App.get('/dodawanie', cors(), (req, res) => {
-    res.render("addCompetitors");
+    res.render("addCompetitors", {beforeFightsStart: true, wrongTimeText: "Nie można już dodawać zawodników", redirectOnWrongtime: false});
 })
 
 App.get("/kategorie", cors(), (req, res) => {
-    res.render('categories');
+    res.render('categories', {beforeFightsStart: true, wrongTimeText: "Nie można już edytować kategorii", redirectOnWrongtime: false});
 })
 
 App.get('/zegar', cors(), (req, res) => {
-    res.render("clock", {clock: true});
+    res.render("clock", {clock: true, afterFightsStart: true, redirectOnWrongtime: true});
 })
 
 App.get("/stolikGlowny", cors(), (req, res) => {
-    res.render("mainTable")
+    res.render("mainTable", {afterFightsStart: true, redirectOnWrongtime: false});
 })
 
-if(process.env.ENVIRONMENT === "test"){
+if(process.env.ENVIRONMENT === "DEV"){
     App.get("/test", cors(), (req, res) => {
         res.render("test");
     })
 }
 
 App.get("/wybierzStolik", cors(), (req, res) => {
-    res.render("chooseTable");
+    res.render("chooseTable", {afterFightsStart: true, redirectOnWrongtime: false});
 })
 
 App.get("/stolikMaly", cors(), (req, res) => {
-    res.render("smallTable");
+    res.render("smallTable", {afterFightsStart: true, redirectOnWrongtime: false});
 })
 
 App.get("/wynikiKategorii", cors(), (req, res) => {
-    res.render("categoryResults");
+    res.render("categoryResults", {afterFightsStart: true, redirectOnWrongtime: false});
 })
 
 App.get("/konfiguracja", cors(), (req, res) => {

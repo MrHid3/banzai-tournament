@@ -1,3 +1,5 @@
+const numberOfTables = (await fetch(`/getConfig?token=${token}`)).json().numberOfTables;
+
 const tableContainer = document.querySelector("#tableButtonsContainer");
 
 for(let i = 1; i <= numberOfTables; i++) {

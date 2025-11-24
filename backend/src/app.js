@@ -29,7 +29,7 @@ const roles = [
     {role: "referee", password: process.env.USER_REFEREE_PASSWORD},
 ]
 
-if(process.env.ENVIRONMENT === 'test'){
+if(process.env.ENV === 'dev'){
     roles.push({role: "test", password: process.env.USER_TEST_PASSWORD});
 }
 
@@ -380,7 +380,7 @@ App.get("/getCategoryResults/:id", authenticateToken, authenticateAdmin, authent
     }
 })
 
-if(process.env.ENVIRONMENT === "test"){
+if(process.env.ENV === "dev"){
     App.post("/clearBase", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
         try{
             await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE; TRUNCATE tables CASCADE")
