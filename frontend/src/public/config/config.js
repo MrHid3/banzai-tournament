@@ -1,9 +1,4 @@
-const configed = await (await fetch(`${backendURL}/getConfig?token=${token}`)).json();
-const config = {};
-for(const key of configed){
-    config[key.key] = key.value;
-}
-console.log(config)
+const config = await (await fetch(`${backendURL}/getConfig?token=${token}`)).json();
 
 const beginButton = document.getElementById('beginButton');
 const tableSpan = document.getElementById('numberOnSlider');
@@ -22,9 +17,9 @@ if(config.fightsEnabled == 1){
     beginButton.style.display = "none";
 }
 
-beginButton.addEventListener('click', (event) => {
+beginButton.addEventListener('click', async (event) => {
     if(confirm("Czy na pewno chcesz zacząć walki? Nie będziesz mógł już dodawać zawodników ani edytować kategorii")){
-        fetch(`${backendURL}/config?token=${token}`, {
+        await fetch(`${backendURL}/config?token=${token}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

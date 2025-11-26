@@ -10,6 +10,7 @@ dotenv.config("../")
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const isTest = (process.env.ENV === "dev");
 
 const App = express();
 
@@ -20,8 +21,14 @@ App.set('views', path.join(__dirname, 'views'));
 App.use(express.json());
 App.use(express.urlencoded({ extended: true }));
 App.use(express.static(path.join(__dirname, 'public')));
-App.locals.test = (process.env.ENVIRONMENT === "test");
+App.locals.test = isTest;
 App.locals.backendURL = process.env.BACKEND_URL;
+
+if(isTest){
+    App.get("/test", cors(), (req, res) => {
+        res.render("test");
+    })
+}
 
 App.get('/', cors(), (req, res) => {
     res.redirect("/menu");
@@ -36,37 +43,31 @@ App.get('/menu', cors(), (req, res) => {
 })
 
 App.get('/dodawanie', cors(), (req, res) => {
-    res.render("addCompetitors", {beforeFightsStart: true, wrongTimeText: "Nie można już dodawać zawodników", redirectOnWrongtime: false});
+    res.render("addCompetitors", {beforeFightsStart: true, wrongTimeText: "Nie można już dodawać zawodników", redirectOnWrongTime: false});
 })
 
 App.get("/kategorie", cors(), (req, res) => {
-    res.render('categories', {beforeFightsStart: true, wrongTimeText: "Nie można już edytować kategorii", redirectOnWrongtime: false});
+    res.render('categories', {beforeFightsStart: true, wrongTimeText: "Nie można już edytować kategorii", redirectOnWrongTime: false});
 })
 
 App.get('/zegar', cors(), (req, res) => {
-    res.render("clock", {clock: true, afterFightsStart: true, redirectOnWrongtime: true});
+    res.render("clock", {clock: true, afterFightsStart: true, redirectOnWrongTime: true});
 })
 
 App.get("/stolikGlowny", cors(), (req, res) => {
-    res.render("mainTable", {afterFightsStart: true, redirectOnWrongtime: false});
+    res.render("mainTable", {afterFightsStart: true, redirectOnWrongTime: false});
 })
 
-if(process.env.ENVIRONMENT === "DEV"){
-    App.get("/test", cors(), (req, res) => {
-        res.render("test");
-    })
-}
-
 App.get("/wybierzStolik", cors(), (req, res) => {
-    res.render("chooseTable", {afterFightsStart: true, redirectOnWrongtime: false});
+    res.render("chooseTable", {afterFightsStart: true, redirectOnWrongTime: false});
 })
 
 App.get("/stolikMaly", cors(), (req, res) => {
-    res.render("smallTable", {afterFightsStart: true, redirectOnWrongtime: false});
+    res.render("smallTable", {afterFightsStart: true, redirectOnWrongTime: false});
 })
 
 App.get("/wynikiKategorii", cors(), (req, res) => {
-    res.render("categoryResults", {afterFightsStart: true, redirectOnWrongtime: false});
+    res.render("categoryResults", {afterFightsStart: true, redirectOnWrongTime: false});
 })
 
 App.get("/konfiguracja", cors(), (req, res) => {
