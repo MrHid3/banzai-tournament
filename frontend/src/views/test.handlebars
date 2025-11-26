@@ -6,10 +6,12 @@
 <button id="dodaj" style="margin: 10% auto 10px auto; padding: 10px; font-size: 16px; display: block;">>dodaj 10 zawodników<</button>
 <button id="clear" style="margin: 10px auto; padding: 10px; font-size: 16px; display: block;">>wyczyść baze<</button>
 <button id="dodaj100" style="margin: 10px auto; padding: 10px; font-size: 16px; display: block;">>dodaj 100 zawodników<</button>
+<button id="resetFights" style="margin: 10px auto; padding: 10px; font-size: 16px; display: block;">>wyłącz walki (wyczyści wyniki walk)</button>
 <script>
     const dodajButton = document.getElementById("dodaj");
-    dodaj100 = document.getElementById("dodaj100");
+    const dodaj100 = document.getElementById("dodaj100");
     const clearButton = document.getElementById("clear");
+    const resetFightsButton = document.getElementById("resetFights");
 
     dodajButton.addEventListener("click", async () => {
 
@@ -43,7 +45,6 @@
     });
 
     dodaj100.addEventListener("click", async () => {
-
         const lowercaseAsciiStart = 97;
         for(let i = 0; i < 100; i++) {
             const letterIndex = Math.floor(Math.random() * 26);
@@ -82,5 +83,24 @@
                 token: token
             })
         })
+    })
+    resetFightsButton.addEventListener("click", async () => {
+        await fetch(`${backendURL}/resetFights?token=${token}`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+        await fetch(`${backendURL}/config?token=${token}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                key: "fightsEnabled",
+                value: 0
+            })
+        })
+        window.location.reload();
     })
 </script>

@@ -75,7 +75,7 @@ async function fillList(categoryId, competitors) {
         const data = await result.json();
         fightResults = data;
     } catch (err) {
-        console.error("Błąd pobierania wyników walk:", err);
+        console.error("Błąd pobierania wyników walk:", err);1
     }
 
     let allMatchesDone = (competitors.length * (competitors.length -1) / 2 == fightResults.length); // flaga sprawdzająca, czy wszystkie walki zakończone

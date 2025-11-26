@@ -13,6 +13,7 @@ dotenv.config("../");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const secretKey = process.env.TOKEN_SECRET;
+const isTest = (process.env.ENV === 'dev');
 
 const pool = new pg.Pool({
     host: process.env.DB_HOST,
@@ -29,7 +30,7 @@ const roles = [
     {role: "referee", password: process.env.USER_REFEREE_PASSWORD},
 ]
 
-if(process.env.ENVIRONMENT === 'test'){
+if(isTest){
     roles.push({role: "test", password: process.env.USER_TEST_PASSWORD});
 }
 
@@ -154,6 +155,28 @@ function authenticateRole(req, res, next){
     }else{
         res.sendStatus(403);
     }
+}
+
+if(isTest){
+    App.post("/clearBase", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
+        try{
+            await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE; TRUNCATE tables CASCADE")
+            res.sendStatus(200);
+        }catch(error){
+            console.log(error);
+            res.sendStatus(500);
+        }
+    })
+
+    App.post("/resetFights", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
+        try{
+            await pool.query(`TRUNCATE fightResults CASCADE; TRUNCATE tables CASCADE`);
+            res.sendStatus(200);
+        }catch(error){
+            console.log(error);
+            res.sendStatus(500);
+        }
+    })
 }
 
 App.post('/login', async(req, res) => {
@@ -370,7 +393,7 @@ App.get("/getFightResults/:id", authenticateToken, authenticateAdmin, authentica
     }
 })
 
-App.get("/getCategoryResults/:id", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
+App.get("/getCategoryResults/:id", authenticateToken, authenticateAdmin, authenticateReferee, authenticateRole, async (req, res) => {
     try{
         const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE category_id = $1", [req.params.id]);
         res.send(fightResultsQuery.rows);
@@ -379,18 +402,6 @@ App.get("/getCategoryResults/:id", authenticateToken, authenticateAdmin, authent
         res.sendStatus(500);
     }
 })
-
-if(process.env.ENVIRONMENT === "test"){
-    App.post("/clearBase", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
-        try{
-            await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE; TRUNCATE tables CASCADE")
-            res.sendStatus(200);
-        }catch(error){
-            console.log(error);
-            res.sendStatus(500);
-        }
-    })
-}
 
 App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
@@ -515,8 +526,7 @@ App.post("/config", authenticateToken, authenticateReferee, authenticateRole, as
 
 App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, async(req, res) => {
     try{
-        const query = (await pool.query("SELECT key, value FROM config")).rows;
-        res.send(query);
+        res.send(config);
     }catch(error){
         console.log(error);
         res.send(500);

@@ -4,10 +4,9 @@
     <link rel="stylesheet" href="chooseTable/chooseTable.css">
 </head>
 <body>
-<script>
-    //todo: pull ts from server
-    const numberOfTables = 5;
-
+<script type="module">
+    const config = await (await fetch(`${backendURL}/getConfig?token=${token}`)).json();
+    const numberOfTables = config.numberOfTables;
     if(localStorage.getItem("tableNumber") != null && localStorage.getItem("tableNumber") <= numberOfTables) {
         window.location.href = "/stolikMaly"
     }
@@ -15,5 +14,5 @@
     <div id="tableButtonsContainer">
 
     </div>
-<script src="/chooseTable/chooseTable.js"></script>
+<script src="/chooseTable/chooseTable.js" type="module"></script>
 </body>

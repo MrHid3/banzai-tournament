@@ -1,3 +1,5 @@
+const config = await (await fetch(`${backendURL}/getConfig?token=${token}`)).json();
+const numberOfTables = config.numberOfTables;
 const tableContainer = document.querySelector("#tableButtonsContainer");
 
 for(let i = 1; i <= numberOfTables; i++) {
