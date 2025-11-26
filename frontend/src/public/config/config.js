@@ -1,5 +1,4 @@
 const config = await (await fetch(`${backendURL}/getConfig?token=${token}`)).json();
-
 const beginButton = document.getElementById('beginButton');
 const tableSpan = document.getElementById('numberOnSlider');
 const tableSlider = document.getElementById('tableSlider');
@@ -16,7 +15,7 @@ halfSelect.value = config.half;
 if(config.fightsEnabled == 1){
     beginButton.style.display = "none";
 }
-
+console.log(config)
 beginButton.addEventListener('click', async (event) => {
     if(confirm("Czy na pewno chcesz zacząć walki? Nie będziesz mógł już dodawać zawodników ani edytować kategorii")){
         await fetch(`${backendURL}/config?token=${token}`, {

@@ -59,11 +59,11 @@ App.get("/stolikGlowny", cors(), (req, res) => {
 })
 
 App.get("/wybierzStolik", cors(), (req, res) => {
-    res.render("chooseTable", {afterFightsStart: true, redirectOnWrongTime: false});
+    res.render("chooseTable", {afterFightsStart: true, redirectOnWrongTime: true});
 })
 
 App.get("/stolikMaly", cors(), (req, res) => {
-    res.render("smallTable", {afterFightsStart: true, redirectOnWrongTime: false});
+    res.render("smallTable", {afterFightsStart: true, redirectOnWrongTime: true});
 })
 
 App.get("/wynikiKategorii", cors(), (req, res) => {

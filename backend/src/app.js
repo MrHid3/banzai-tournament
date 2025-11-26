@@ -158,7 +158,7 @@ function authenticateRole(req, res, next){
 }
 
 if(isTest){
-    App.post("/clearBase", authenticateToken, authenticateRole, async (req, res) => {
+    App.post("/clearBase", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
         try{
             await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE competitors CASCADE; TRUNCATE categories CASCADE; TRUNCATE tables CASCADE")
             res.sendStatus(200);
@@ -168,10 +168,10 @@ if(isTest){
         }
     })
 
-    App.post("/resetFights", authenticateToken, authenticateRole, async (req, res) => {
+    App.post("/resetFights", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
         try{
-            await pool.query("TRUNCATE fightResults CASCADE; TRUNCATE tables CASCADE; UPDATE config SET value = 0 WHERE key = fightsEnabled");
-
+            await pool.query(`TRUNCATE fightResults CASCADE; TRUNCATE tables CASCADE`);
+            res.sendStatus(200);
         }catch(error){
             console.log(error);
             res.sendStatus(500);
@@ -393,7 +393,7 @@ App.get("/getFightResults/:id", authenticateToken, authenticateAdmin, authentica
     }
 })
 
-App.get("/getCategoryResults/:id", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
+App.get("/getCategoryResults/:id", authenticateToken, authenticateAdmin, authenticateReferee, authenticateRole, async (req, res) => {
     try{
         const fightResultsQuery = await pool.query("SELECT * FROM fightResults WHERE category_id = $1", [req.params.id]);
         res.send(fightResultsQuery.rows);

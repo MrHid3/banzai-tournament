@@ -59,7 +59,8 @@
         })
         if (!response.ok) {
             window.location.href = '/login';
-        }}
+        }
+    }
     verify();
     const logout = document.querySelector('#logout');
     logout.addEventListener('click', (e) => {
@@ -69,8 +70,36 @@
             localStorage.setItem('token', '');
     })
     {{/unless}}
-
 </script>
+{{#unless login}}
+<script type="module">
+    const config = await (await fetch(`${backendURL}/getConfig?token=${token}`)).json();
+    {{#if afterFightsStart}}
+        if(config.fightsEnabled == 0){
+            {{#if wrongTimeText}}
+                alert(`{{{wrongTimeText}}}`)
+            {{else}}
+                alert("Walki jeszcze się nie zaczęły");
+            {{/if}}
+            {{#if redirectOnWrongTime}}
+                window.location.href = "/menu";
+            {{/if}}
+        }
+    {{/if}}
+    {{#if beforeFightsStart}}
+       if(config.fightsEnabled == 1){
+           {{#if wrongTimeText}}
+               alert(`{{{wrongTimeText}}}`)
+           {{else}}
+               alert("Walki już się zaczęły");
+           {{/if}}
+           {{#if redirectOnWrongTime}}
+               window.location.href = "/menu";
+           {{/if}}
+       }
+    {{/if}}
+</script>
+{{/unless}}
 {{{body}}}
 </body>
 </html>

@@ -6,7 +6,7 @@
 <button id="dodaj" style="margin: 10% auto 10px auto; padding: 10px; font-size: 16px; display: block;">>dodaj 10 zawodników<</button>
 <button id="clear" style="margin: 10px auto; padding: 10px; font-size: 16px; display: block;">>wyczyść baze<</button>
 <button id="dodaj100" style="margin: 10px auto; padding: 10px; font-size: 16px; display: block;">>dodaj 100 zawodników<</button>
-<button id="resetFights" style="margin: 10px auto; padding: 10px; font-size: 16px; display: block;">wyłącz walki (wyczyści wyniki walk)</button>
+<button id="resetFights" style="margin: 10px auto; padding: 10px; font-size: 16px; display: block;">>wyłącz walki (wyczyści wyniki walk)</button>
 <script>
     const dodajButton = document.getElementById("dodaj");
     const dodaj100 = document.getElementById("dodaj100");
@@ -84,7 +84,23 @@
             })
         })
     })
-    // resetFightsButton.addEventListener("click", async () => {
-    //     fetch(`${backendURL/}`)
-    // })
+    resetFightsButton.addEventListener("click", async () => {
+        await fetch(`${backendURL}/resetFights?token=${token}`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+        await fetch(`${backendURL}/config?token=${token}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                key: "fightsEnabled",
+                value: 0
+            })
+        })
+        window.location.reload();
+    })
 </script>
