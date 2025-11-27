@@ -154,7 +154,7 @@ html, body {
   border: none;
   border-radius: 0;
   background: var(--bg-action);
-  color: var(--bg-secondary);
+  color: rgba(0, 0, 0, 0.2);
   font-size: 48px;
   font-weight: bold;
   cursor: pointer;
@@ -176,15 +176,19 @@ html, body {
   align-items: center;
   border-radius: 0;
   background: var(--bg-action);
-  color: var(--bg-secondary);
+  color: var(--highlight);
   cursor: pointer;
   user-select: none;
   transition: background 0.3s ease;
 }
 
+.timer.running{
+  color: var(--bg-secondary) !important;
+}
+
 .timer.blink {
   background: var(--highlight) !important;
-  color: var(--text-active);
+  color: var(--text-active) !important;
 }
 
 /* MENU WYNIKÓW — ZMNIEJSZONE 2x */

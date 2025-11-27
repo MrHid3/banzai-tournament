@@ -5,6 +5,8 @@ main {
     gap: 20px;
     justify-content: space-between;
     align-items: flex-start;
+    width: 80%;
+    margin: 0 auto;
 }
 
 #left, #right {
@@ -16,7 +18,7 @@ main {
     height: 50px;
     color: var(--text-active);
     background-color: var(--highlight); /* czerwony zostaje tylko tu */
-    border-radius: 10px 10px;
+    border-radius: 0 0 10px 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -90,14 +92,15 @@ table tbody tr.selected {
     cursor: pointer;
     color: var(--text-active);
     background-color: var(--highlight); /* tu czerwony zostaje */
-    border-radius: 6px;
+    border-radius: 0 0 10px 10px;
     transition: 0.2s;
     display: block;
     margin: 0 auto 20px auto;
+    width: 100%;
 }
 
 #Zawolaj:hover {
-    opacity: 0.85;
+    background-color: #cc000099;
 }
 
 .martwy {
@@ -188,4 +191,12 @@ table tbody tr.selected {
 
 .Walczył{
     background-color: red;
+}
+
+.endButton{
+    background-color: var(--highlight);
+    color: var(--text-active);
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
 }

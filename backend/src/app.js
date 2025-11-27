@@ -499,7 +499,7 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
                 delete c.location;
             delete c.is_name_duplicate;
             await pool.query("UPDATE competitors SET place = $1 WHERE id = $2", [c.place, c.id]);
-            if(c.noShow === competitors.length - 1)
+            if(c.noShow === competitors.length - 1 && competitors.length !== 1)
                 c.absent = true;
             delete c.noShow;
         }

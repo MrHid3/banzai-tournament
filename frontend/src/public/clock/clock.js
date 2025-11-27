@@ -14,7 +14,8 @@ const timerElement = getElement("timer");
 function startTimer() {
   if (timerRunning) return;
   timerRunning = true;
-timerElement.classList.remove('blink2');
+  timerElement.classList.remove('blink2');
+  timerElement.classList.add('running');
 
   timerInterval = setInterval(() => {
     if(timeLeft > 0){
@@ -30,6 +31,7 @@ timerElement.classList.remove('blink2');
 function stopTimer() {
   timerRunning = false;
   timerElement.classList.remove('blink2');
+  timerElement.classList.remove('running');
   clearInterval(timerInterval);
 }
 

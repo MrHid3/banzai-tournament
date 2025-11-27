@@ -137,9 +137,8 @@ async function fillList(categoryId, competitors) {
     if (allMatchesDone) {
         const endBtn = document.createElement("button");
         endBtn.textContent = "Zakończ grupę";
-        endBtn.style.backgroundColor = "var(--highlight)";
-        endBtn.style.color = "var(--text-active)";
-        endBtn.style.marginTop = "10px";
+        endBtn.classList.add("fight-row");
+        endBtn.classList.add("endButton")
         endBtn.addEventListener("click", async () => {
             try {
                 const response = await fetch(`${backendURL}/endCategory`, {
@@ -212,6 +211,8 @@ fetch(`${backendURL}/getGroups/?tableNumber=${tableNumber}&token=${token}`)
                 .catch(err => {
                     console.error(`Błąd kategorie ${idFirst}`, err);
                 });
+        else
+            document.getElementById("TableFirst").style.display = "none";
         if(idSecound)
             await fetch(`${backendURL}/getCategory/${idSecound}?token=${token}`)
                 .then(odp => odp.json())
@@ -222,6 +223,9 @@ fetch(`${backendURL}/getGroups/?tableNumber=${tableNumber}&token=${token}`)
                 .catch(err => {
                     console.error(`Błąd kategorie ${idSecound}`, err);
                 });
+        else{
+            document.getElementById("TableSecound").style.display = "none";
+        }
 
     })
     .catch(err => {

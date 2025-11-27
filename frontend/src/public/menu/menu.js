@@ -1,8 +1,8 @@
 const rolesAccess = {
-    "test": ["adding", "clock", "categories", "mainTable", "test", "smallTable", "chooseTable", "categoryResults", "config"],
+    "test": ["adding", "categories", "mainTable", "test", "smallTable", "chooseTable", "config"],
     "adder": ["adding"],
     "bigReferee": ["mainTable"],
-    "referee": ["chooseTable", "smallTable", "clock"],
+    "referee": ["chooseTable", "smallTable"],
     "admin": ["categories", "config", "categoryResults"],
 }
 
