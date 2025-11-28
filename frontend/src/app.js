@@ -21,6 +21,7 @@ App.set('views', path.join(__dirname, 'views'));
 App.use(express.json());
 App.use(express.urlencoded({ extended: true }));
 App.use(express.static(path.join(__dirname, 'public')));
+App.use("/favicon.ico", express.static(path.join(__dirname, 'public/images/favicon-transparent.ico')));
 App.locals.test = isTest;
 App.locals.backendURL = process.env.BACKEND_URL;
 

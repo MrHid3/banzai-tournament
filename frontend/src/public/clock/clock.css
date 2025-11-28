@@ -7,14 +7,8 @@
   --highlight: #cc0000;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  font-family: sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+body{
+  background-position-x: 40%;
 }
 
 .main-container {

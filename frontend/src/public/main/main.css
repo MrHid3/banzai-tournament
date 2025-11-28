@@ -12,6 +12,11 @@ body{
     background-color: var(--bg-primary);
     width: 100vw;
     height: 100vh;
+    background-image: url("http://localhost:3000/resources/banzai-transparent.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-blend-mode: overlay;
 }
 
 #main-header{
