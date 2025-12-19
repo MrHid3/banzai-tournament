@@ -39,7 +39,7 @@ if(localStorage.getItem("location") != null){
     locationSelect.value = localStorage.getItem("location");
     firstLocationChoice = false;
     locationCompetitors = await getResource(`${backendURL}/getCompetitors/school/${locationSelect.value}`, token) ?? [];
-    locationCompetitors.reverse()
+    // locationCompetitors.reverse()
     locationCompetitors.forEach(competitor => {
         addCompetitor(competitor.id, competitor.name, competitor.surname, competitor.age, competitor.weight, competitor.level);
         competitor.exists = true;
@@ -129,7 +129,7 @@ function addCompetitor(id=-1, name="", surname="", age="", weight="", level=-1) 
     defaultOption.selected = true;
     defaultOption.disabled = true;
     levelSelect.appendChild(defaultOption);
-    const levels = ["1 (<1 rok)", "2 (1-3 lata)", "3 (3+ lat)"]
+    const levels = ["1 (<1 rok)", "2 (pierdoły)","3 (1-3 lata)", "4 (3+ lat)"]
     for (let i = 0; i < levels.length; i++) {
         const option = document.createElement("option");
         option.value = String(i);

@@ -12,7 +12,7 @@ body{
     background-color: var(--bg-primary);
     width: 100vw;
     height: 100vh;
-    background-image: url("http://localhost:3000/resources/banzai-transparent.png");
+    background-image: url("../images/logos/circle-color.png");
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -24,17 +24,22 @@ body{
     top: 0;
     bottom: 0;
     width: 100%;
-    height: fit-content;
+    height: 10vh;
+    max-height: 100px;
     background-color: var(--bg-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 0;
+    padding: 10px 10px;
     z-index: 1420;
     box-shadow: 0px 1px 1px rgba(3, 7, 18, 0.06),
     0px 6px 3px rgba(3, 7, 18, 0.11),
     0px 13px 7px rgba(3, 7, 18, 0.17),
     0px 23px 13px rgba(3, 7, 18, 0.22);
+    background-image: url("../images/logos/horizontal-background-black.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-origin: content-box;
 }
 
 #goBack, #logout{

@@ -26,7 +26,7 @@
     0px 17px 107px rgba(3, 7, 18, 0.24);
 }
 
-a{
+.menu-item{
     color: var(--text-active);
     text-decoration: none;
     background-color: var(--highlight);
@@ -39,14 +39,24 @@ a{
     transition-delay: 0.05s;
 }
 
-a:first-child{
-    border-radius: 5px 5px 0 0;
-}
+/*.menu-item:not([style*="display: none"]):first-child{*/
+/*    border-radius: 5px 5px 0 0;*/
+/*}*/
 
-a:last-child{
-    border-radius: 0 0 5px 5px;
-}
+/*.menu-item:last-child{*/
+/*    border-radius: 0 0 5px 5px;*/
+/*}*/
 
 a:hover{
-    padding: 20px 10px;
+    /*padding: 20px 10px;*/
+    background-color: #cc000099;
+}
+
+.banzai{
+    background-image: url("../images/logos/horizontal-background-black.png");
+    display: block !important;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 10vh;
 }

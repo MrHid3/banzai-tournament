@@ -170,7 +170,7 @@ if(isTest){
 
     App.post("/resetFights", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
         try{
-            await pool.query(`TRUNCATE fightResults CASCADE; TRUNCATE tables CASCADE`);
+            await pool.query(`TRUNCATE fightResults CASCADE; TRUNCATE tables CASCADE; UPDATE competitors SET place = null; UPDATE categories SET played_out = false;`);
             res.sendStatus(200);
         }catch(error){
             console.log(error);
@@ -178,6 +178,10 @@ if(isTest){
         }
     })
 }
+
+App.get("/", (req, res) => {
+    res.sendStatus(200);
+})
 
 App.post('/login', async(req, res) => {
     try{
@@ -301,7 +305,7 @@ App.get("/getCategories", authenticateToken, authenticateAdmin, authenticateRole
         let index = 0;
         for (const category of categoriesQuery.rows) {
             result.push({kategorie: category.id, half: category.half, level: category.level, zawodnicy: []});
-            const competitorsQuery = await pool.query("SELECT id, name, surname, age, weight, level, location FROM competitors WHERE category_id = $1", [category.id]);
+            const competitorsQuery = await pool.query("SELECT co.id, co.name, co.surname, co.age, co.weight, co.level, co.location, ca.half FROM competitors co LEFT JOIN categories ca ON ca.id = co.category_id WHERE co.category_id = $1", [category.id]);
             for(const competitor of competitorsQuery.rows){
                 result[index].zawodnicy.push(competitor);
             }
@@ -337,9 +341,13 @@ App.post("/saveCategories", authenticateToken, authenticateAdmin, authenticateRo
         }
         await pool.query("UPDATE competitors SET category_id = NULL")
         await pool.query("DELETE FROM categories");
+        if(req.body.categories == []){
+            res.sendStatus(200)
+            return;
+        }
         req.body.categories.forEach(async (category) => {
             const parametersQuery = await pool.query("SELECT level, age FROM competitors WHERE id = ANY($1::int[]) ORDER BY age ASC LIMIT 1", [category.zawodnicy]);
-            await pool.query("INSERT INTO categories(id, level, half, played_out) VALUES ($1, $2, $3, $4)", [category.kategoria, parametersQuery.rows[0].level, parametersQuery.rows[0].age <= 10 ? 1 : 2, false])
+            await pool.query("INSERT INTO categories(id, level, half, played_out) VALUES ($1, $2, $3, $4)", [category.kategoria, parametersQuery.rows[0].level, category.half, false])
             await pool.query("UPDATE competitors SET category_id = $1 WHERE id = ANY($2::int[]) AND level = $3", [category.kategoria, category.zawodnicy, parametersQuery.rows[0].level])
         })
         res.sendStatus(200)
@@ -524,7 +532,7 @@ App.post("/config", authenticateToken, authenticateReferee, authenticateRole, as
     }
 })
 
-App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, async(req, res) => {
+App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, authenticateRole, async(req, res) => {
     try{
         res.send(config);
     }catch(error){
@@ -533,6 +541,22 @@ App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, a
     }
 })
 
+// App.post("/switchHalf", authenticateToken, authenticateAdmin, async(req, res) => {
+//     const {categoryID, half} = req.body;
+//     await pool.query("UPDATE categories SET half = $1 WHERE id = $2", [half, categoryID]);
+//     res.send(200);
+// })
+
+App.get("/getAllResults", authenticateToken, authenticateAdmin, authenticateRole, async(req, res) => {
+    try{
+        const result = (await (pool.query("SELECT ca.id, co.name, co.surname, co.location, co.is_name_duplicate, co.place, co.category_id FROM competitors co LEFT JOIN categories ca ON co.category_id = ca.id WHERE ca.played_out IS TRUE ORDER BY ca.id, co.place ASC"))).rows
+        res.send(result);
+    }catch(error){
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
 server.listen(3000, () => {
-    console.log(`Backend is up at ${process.env.BACKEND_URL}`);
+    console.log(`Backend is up`);
 });

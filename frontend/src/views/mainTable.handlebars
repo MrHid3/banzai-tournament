@@ -18,7 +18,7 @@
 </body>
 <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 <script>
-    const socket = io(backendURL);
+    const socket = io({url: backendURL, path: "/api/socket.io"});
 </script>
 <script src="/mainTable/mainTable.js" type="module"></script>
 </body>

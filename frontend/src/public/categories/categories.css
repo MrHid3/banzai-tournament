@@ -104,6 +104,8 @@ i{
     padding: 5px;
     /*display: block;*/
     float: right;
+    user-select: none;
+    cursor: pointer;
 }
 
 main{
@@ -295,3 +297,32 @@ input[type=checkbox] {
     border: 1px solid #ddd;
     border-radius: 4px;
 }
+
+.wide{
+    width: 100% !important;
+    display: flex;
+    flex-wrap: wrap !important;
+    flex-direction: column;
+    gap: 0 10px;
+    /*padding: 0 50px !important;*/
+}
+
+.wide > *{
+    width: 30%;
+}
+
+.wide::-webkit-scrollbar {
+    background-color: transparent;
+    width: 5px;
+    display: block !important;
+}
+
+.wide::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 10px;
+    display: block !important;
+}
+
+/*.wide::-webkit-scrollbar, #zawodnicy-container::-webkit-scrollbar {*/
+/*    display: none;  !* Older Safari and Chromium *!*/
+/*}*/

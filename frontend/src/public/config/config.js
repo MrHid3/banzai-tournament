@@ -14,8 +14,9 @@ halfSelect.value = config.half;
 
 if(config.fightsEnabled == 1){
     beginButton.style.display = "none";
+    tableSlider.style.display = "none";
 }
-console.log(config)
+
 beginButton.addEventListener('click', async (event) => {
     if(confirm("Czy na pewno chcesz zacząć walki? Nie będziesz mógł już dodawać zawodników ani edytować kategorii")){
         await fetch(`${backendURL}/config?token=${token}`, {

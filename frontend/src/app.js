@@ -67,8 +67,8 @@ App.get("/stolikMaly", cors(), (req, res) => {
     res.render("smallTable", {afterFightsStart: true, redirectOnWrongTime: true});
 })
 
-App.get("/wynikiKategorii", cors(), (req, res) => {
-    res.render("categoryResults", {afterFightsStart: true, redirectOnWrongTime: false});
+App.get("/wyniki", cors(), (req, res) => {
+    res.render("results", {afterFightsStart: true, redirectOnWrongTime: false});
 })
 
 App.get("/konfiguracja", cors(), (req, res) => {
@@ -76,5 +76,5 @@ App.get("/konfiguracja", cors(), (req, res) => {
 })
 
 App.listen(4000, () => {
-    console.log(`Frontend is up at ${process.env.FRONTEND_URL}`);
+    console.log(`Frontend is up`);
 });

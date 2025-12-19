@@ -6,6 +6,7 @@ async function getResource(resourceName, token=null) {
         return null
     }
 }
+
 const locations = await getResource(`${backendURL}/resources/locations.json`);
 const awardsDiv = document.querySelector("#awards");
 const callDiv = document.querySelector("#calls");

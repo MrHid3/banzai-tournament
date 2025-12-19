@@ -9,7 +9,6 @@ const butZawolaj = document.getElementById('Zawolaj');
 const niepot = document.getElementById("niepotrzebne");
 let Zawodnicy = [];
 
-
 //                Wypełnianie Tabeli
 
 function fillTable(tableId, categoryId, competitors){

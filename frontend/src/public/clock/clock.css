@@ -1,14 +1,7 @@
-:root {
-  --bg-primary: #242e35;
-  --bg-secondary: #1d1d1b;
-  --bg-action: #ffffff;
-  --text-primary: #a0969a;
-  --text-active: #ffffff;
-  --highlight: #cc0000;
-}
+@import url("../colors.css");
 
 body{
-  background-position-x: 40%;
+  background-position-x: 0%;
 }
 
 .main-container {
@@ -84,6 +77,14 @@ body{
   line-height: 1;
   color: var(--text-active);
   margin: 8px 0;
+  user-select: none;
+}
+
+select{
+  height: 5vh;
+  text-align: center;
+  min-width: 50%;
+  width: fit-content;
 }
 
 /* Linia podziału */
@@ -130,12 +131,14 @@ body{
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--bg-secondary);
+  /*color: var(--bg-secondary);*/
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   border-radius: 0;
   position: relative;
   overflow: hidden;
+  user-select: none;
+  color: rgba(0, 0, 0, 0.7)
 }
 
 /* Minus */
@@ -191,18 +194,19 @@ body{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: var(--bg-secondary);
-  padding: 30px; /* było 60px */
-  border-radius: 0;
+  background: #1d1d1bcc;
+  padding: 60px; /* było 60px */
+  border-radius: 15px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.6);
   display: none;
   flex-direction: column;
-  gap: 14px; /* było 28px */
+  gap: 28px; /* było 28px */
   align-items: center;
   justify-content: center;
-  width: 340px; /* było 680px */
+  width: 40vw; /* było 680px */
   z-index: 1000;
-  font-size: 18px; /* było 36px */
+  font-size: 36px; /* było 36px */
+  color: var(--text-active);
 }
 
 .btn {
@@ -224,7 +228,11 @@ body{
 
 .btn.secondary {
   background: var(--bg-action);
-  color: var(--bg-secondary);
+  color: black;
+}
+
+.btn.secondary:hover {
+  background: #a2a2a2;
 }
 
 .small {
