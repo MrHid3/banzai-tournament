@@ -1,7 +1,14 @@
+name: banzai-tournament
 services:
   postgresdb:
+    container_name: banzai-postgresdb
     image: postgres
     restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}" ]
+      interval: 2s
+      timeout: 2s
+      retries: 10
     env_file:
       - ./.env
     environment:
@@ -13,9 +20,16 @@ services:
     volumes:
       - db:/var/postgresql/data
   backend:
+    container_name: banzai-backend
     depends_on:
-      - postgresdb
+      postgresdb:
+        condition: service_healthy
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
+      interval: 3s
+      timeout: 2s
+      retries: 10
     build: backend
     env_file:
       - .env
@@ -23,13 +37,17 @@ services:
       - ./backend:/app
       - /app/node_modules
     ports:
-      - 3000:3000
+      - "3000:3000"
     command:
-      ["sh", "scripts/wait-for-postgres.sh", "npm", "run", "${NPM_COMMAND}"]
+      ["npm", "run", "${NPM_COMMAND}"]
   frontend:
-    depends_on:
-      - backend
+    container_name: banzai-frontend
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4000" ]
+      interval: 2s
+      timeout: 2s
+      retries: 10
     build: frontend
     env_file:
       - .env
@@ -37,8 +55,21 @@ services:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - 4000:4000
+      - "4000:4000"
     command:
       ["npm", "run", "${NPM_COMMAND}"]
+  nginx:
+    container_name: banzai-nginx
+    image: nginx:latest
+    restart: always
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
 volumes:
   db:

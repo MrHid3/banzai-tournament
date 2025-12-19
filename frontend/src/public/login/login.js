@@ -2,6 +2,7 @@ const loginForm = document.querySelector('#login-form')
 const roleSelect = document.querySelector('#role-select')
 const passwordInput = document.querySelector('#password-input')
 
+
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault()
     const response = await fetch(`${backendURL}/login`, {

@@ -4,14 +4,18 @@ let canEdit = true;
 
 const showTable = document.querySelector('#showTable');
 const showCategories = document.querySelector("#showCategories");
+const showPluses = document.querySelector("#pluses");
 const edition = document.querySelector("#edition");
 const categories = document.querySelector("#grupy");
 const table = document.querySelector("#zawodnicy-container");
+const reset = document.querySelector("#reset");
 showTable.addEventListener('input', (e) => {
     if(e.target.checked) {
-       table.style.display = "block";
+        table.style.display = "block";
+        categories.classList.remove("wide");
     }else{
         table.style.display = "none";
+        categories.classList.add("wide");
     }
 })
 
@@ -26,7 +30,7 @@ showCategories.addEventListener('input', (e) => {
 })
 
 edition.addEventListener('input', (e) => {
-    const pluses = document.querySelectorAll(".plus")
+    const pluses = document.querySelectorAll(".plus");
     if(e.target.checked) {
         for(let i = 0; i < pluses.length; i++) {
             pluses[i].style.display = "block";
@@ -37,6 +41,32 @@ edition.addEventListener('input', (e) => {
         }
     }
     canEdit = e.target.checked;
+})
+
+showPluses.addEventListener('input', (e) => {
+    const pluses = document.querySelectorAll(".plus");
+    if(e.target.checked) {
+        if(edition.checked)
+            for(let i = 0; i < pluses.length; i++)
+                pluses[i].style.display = "block";
+    }else
+        for(let i = 0; i < pluses.length; i++)
+            pluses[i].style.display = "none";
+})
+
+reset.addEventListener('click', async (e) => {
+    if (confirm("Czy na pewno chcesz zresetować wszystkie kategorie?")){
+        await fetch(`${backendURL}/saveCategories?token=${token}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+               categories: []
+            })
+        })
+        window.location.reload();
+    }
 })
 
 //****************************************************Kategorie********************************************************//
@@ -99,14 +129,6 @@ async function podzialNaGrupy(){
         const existing = await res.json();
         if (Array.isArray(existing) && existing.length > 0) {
             wyswietlGrupy(existing.map((g, i) => g));
-            let counter = 0;
-            const h3 = document.querySelectorAll("h3").forEach(e => {
-                const i = document.createElement("i");
-                i.textContent = `${existing[counter].half} połowa`
-                e.parentNode.insertBefore(i, e.nextSibling);
-                // e.innerHTML = `<i>${existing[counter].half} połowa</i>`
-                counter++;
-            })
             document.getElementById('zapisz').classList.remove('hidden');
             const resBez = await fetch(`${backendURL}/getCompetitorsWithoutCategories?token=${token}`);
             const bezKat = await resBez.json();
@@ -146,7 +168,7 @@ async function podzialNaGrupy(){
                 nieprzydzieleni = pozostali;
                 grupy.push(grupa);
             }
-            grupy.sort((a, b) => a[0].age  - b[0].age);
+            grupy.sort((a, b) => a[0].age - b[0].age);
             wyswietlGrupy(grupy)
             document.getElementById('zapisz').classList.remove('hidden');
             wyswietlGrupy(grupy)
@@ -174,6 +196,19 @@ function wyswietlGrupy(listaGrup){
         blokGrupy.innerHTML = `<h3>Kategoria ${numerGrupy+1}</h3>`;
 
         addDragDropListener(blokGrupy);
+        const i = document.createElement("i");
+        const half = (grupaZawodnikow[0].half === null || grupaZawodnikow[0].half === undefined ? grupaZawodnikow.sort((a, b) => a.age < b.age)[0].age < 11 ? 1 : 2 : grupaZawodnikow[0].half)
+        // console.log(grupaZawodnikow[0].half === null)
+        i.innerText = `${half} połowa`;
+        i.addEventListener("click", (e) => {
+            if(i.textContent[0] == "1") {
+                i.textContent = `2 połowa`;
+            } else {
+                i.textContent = '1 połowa';
+            }
+        })
+        i.classList.add(`half-${numerGrupy}`)
+        blokGrupy.appendChild(i);
 
         grupaZawodnikow.forEach((zawodnik) =>{
             const zawodnikDiv = document.createElement('div');
@@ -415,9 +450,18 @@ document.getElementById('zapisz').addEventListener('click', async () => {
         .filter(g => !g.classList.contains('plus'))
         .map((grupa, index) => {
             const zawodnicy = Array.from(grupa.querySelectorAll('.zawodnik')).map(z => z.dataset.id);
+            const half= (() => {
+                try{
+                    return document.querySelector(`.half-${index}`).innerText[0]
+                }catch(err){
+                    return 1
+                }
+            })
+            console.log(half)
             return {
                 kategoria: index + 1,
-                zawodnicy: zawodnicy
+                zawodnicy: zawodnicy,
+                half: half()
             };
         })
         .filter(k => k.zawodnicy.length > 0);
@@ -501,3 +545,16 @@ function sprawdzBezKategorii() {
         }
     }
 }
+
+// function switchHalf(categoryID, switchTo) {
+//     fetch(`${backendURL}/switchHalf/?token=${token}`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             categoryID: categoryID,
+//             half: switchTo
+//         })
+//     })
+// }

@@ -1,3 +1,5 @@
+//TODO: dynamic win reasons
+
 const getElement = (id) => document.getElementById(id);
 
 let pointsA = 0;
