@@ -7,9 +7,9 @@
 <script type="module">
     const config = await (await fetch(`${backendURL}/getConfig?token=${token}`)).json();
     const numberOfTables = config.numberOfTables;
-    if(localStorage.getItem("tableNumber") != null && localStorage.getItem("tableNumber") <= numberOfTables) {
-        window.location.href = "/stolikMaly"
-    }
+    // if(localStorage.getItem("tableNumber") != null && localStorage.getItem("tableNumber") <= numberOfTables) {
+    //     window.location.href = "/stolikMaly"
+    // }
 </script>
     <div id="tableButtonsContainer">
 

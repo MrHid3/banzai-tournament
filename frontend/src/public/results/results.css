@@ -13,8 +13,8 @@
 }
 
 .competitor{
-    text-wrap: wrap;
-    word-wrap: break-word;
+    /*text-wrap: wrap;*/
+    /*word-wrap: break-word;*/
     display: block;
     text-align: left !important;
     line-height: 20px;
@@ -24,36 +24,41 @@
     border-radius: 5px;
     margin: 2px;
     color: var(--text-inactive) !important;
+    width: 100% !important;
     /*overflow: hidden;*/
 }
 
 .competitorContainer{
     width: fit-content;
     margin: 0 auto;
-    max-width: 100%;
+    /*max-width: 100%;*/
 }
 
-.awardContainer p, .callContainer p{
+.awardContainer a, .callContainer a, .awardContainer p, .callContainer p{
     text-align: center;
     display: block;
     width: 100%;
     color: var(--text-active);
     font-weight: bold;
     padding: 5px 50px;
+    height: fit-content;
+    text-decoration: none;
 }
+
 .awardContainer, .callContainer{
     height: fit-content;
     /*color: var(--bg-primary);*/
     display: flex;
     flex-direction: column;
+    flex-basis: fit-content;
     gap: 5px;
     background-color: var(--bg-secondary);
     border-radius: 15px;
     padding: 10px;
     /*margin: 10px auto;*/
     border: 5px solid var(--highlight);
-    width: fit-content;
-    max-width: 90%;
+    /*width: 100%;*/
+    /*max-width: 100%;*/
     position: relative;
     border-width: 0 2px 2px 2px;
     animation: create 0.3s ease-in-out;

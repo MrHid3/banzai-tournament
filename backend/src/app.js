@@ -10,6 +10,8 @@ import { Server  } from "socket.io";
 
 dotenv.config("../");
 
+ //TODO: queue for the awards
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const secretKey = process.env.TOKEN_SECRET;
@@ -168,15 +170,6 @@ if(isTest){
         }
     })
 
-    App.post("/resetFights", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
-        try{
-            await pool.query(`TRUNCATE fightResults CASCADE; TRUNCATE tables CASCADE; UPDATE competitors SET place = null; UPDATE categories SET played_out = false;`);
-            res.sendStatus(200);
-        }catch(error){
-            console.log(error);
-            res.sendStatus(500);
-        }
-    })
 }
 
 App.get("/", (req, res) => {
@@ -414,7 +407,7 @@ App.get("/getCategoryResults/:id", authenticateToken, authenticateAdmin, authent
 App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
         const tableNumber = req.query.tableNumber;
-        const currentCategories = await pool.query("SELECT category_id FROM tables WHERE table_number = $1", [tableNumber]);
+        const currentCategories = await pool.query("SELECT t.category_id FROM tables t LEFT JOIN categories c ON c.id = t.category_id WHERE table_number = $1 AND c.half = $2", [tableNumber, config.half]);
         let categories;
         if (currentCategories.rows.length === 0) {
             categories = (await pool.query("SELECT id FROM categories WHERE half = $1 AND played_out IS FALSE AND id NOT IN (SELECT category_id FROM tables) ORDER BY id ASC LIMIT 2 ", [config.half])).rows.map(c => c.id);
@@ -520,7 +513,7 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
     }
 })
 
-App.post("/config", authenticateToken, authenticateReferee, authenticateRole, async(req, res) => {
+App.post("/config", authenticateToken, authenticateReferee, authenticateAdmin, authenticateRole, async(req, res) => {
     try{
         const {key, value} = req.body;
         await pool.query("UPDATE config SET value = $1 WHERE key = $2", [value, key]);
@@ -532,7 +525,7 @@ App.post("/config", authenticateToken, authenticateReferee, authenticateRole, as
     }
 })
 
-App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, authenticateRole, async(req, res) => {
+App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, authenticateReferee, authenticateRole, async(req, res) => {
     try{
         res.send(config);
     }catch(error){
@@ -551,6 +544,16 @@ App.get("/getAllResults", authenticateToken, authenticateAdmin, authenticateRole
     try{
         const result = (await (pool.query("SELECT ca.id, co.name, co.surname, co.location, co.is_name_duplicate, co.place, co.category_id FROM competitors co LEFT JOIN categories ca ON co.category_id = ca.id WHERE ca.played_out IS TRUE ORDER BY ca.id, co.place ASC"))).rows
         res.send(result);
+    }catch(error){
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+App.post("/resetFights", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
+    try{
+        await pool.query(`TRUNCATE fightResults CASCADE; TRUNCATE tables CASCADE; UPDATE competitors SET place = null; UPDATE categories SET played_out = false;`);
+        res.sendStatus(200);
     }catch(error){
         console.log(error);
         res.sendStatus(500);
