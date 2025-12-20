@@ -225,6 +225,10 @@ fetch(`${backendURL}/getGroups/?tableNumber=${tableNumber}&token=${token}`)
         else{
             document.getElementById("TableSecound").style.display = "none";
         }
+        if(!idFirst && !idSecound){
+            butZawolaj.style.display = "none";
+            alert("Skończyły się kategorie na tą połowę");
+        }
 
     })
     .catch(err => {
