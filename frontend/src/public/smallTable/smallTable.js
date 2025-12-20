@@ -227,7 +227,7 @@ fetch(`${backendURL}/getGroups/?tableNumber=${tableNumber}&token=${token}`)
         }
         if(!idFirst && !idSecound){
             butZawolaj.style.display = "none";
-            alert("Skończyły się kategorie na tą połowę");
+            alert("Skończyły się kategorie na tę połowę");
         }
 
     })

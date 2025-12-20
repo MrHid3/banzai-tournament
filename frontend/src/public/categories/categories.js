@@ -457,7 +457,6 @@ document.getElementById('zapisz').addEventListener('click', async () => {
                     return 1
                 }
             })
-            console.log(half)
             return {
                 kategoria: index + 1,
                 zawodnicy: zawodnicy,

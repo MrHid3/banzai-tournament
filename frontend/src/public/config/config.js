@@ -43,23 +43,25 @@ beginButton.addEventListener('click', async (event) => {
 
 
 resetButton.addEventListener('click', async (event) => {
-    await fetch(`${backendURL}/resetFights?token=${token}`, {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json",
-        }
-    });
-    await fetch(`${backendURL}/config?token=${token}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            key: "fightsEnabled",
-            value: 0
+    if(confirm("Czy na pewno chcesz zatrzymać walki? Wszystkie wyniki zostaną usunięte")){
+        await fetch(`${backendURL}/resetFights?token=${token}`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+        await fetch(`${backendURL}/config?token=${token}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                key: "fightsEnabled",
+                value: 0
+            })
         })
-    })
-    window.location.reload();
+        window.location.reload();
+    }
 })
 
 sendButton.addEventListener("click", event => {
