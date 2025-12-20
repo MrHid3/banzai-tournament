@@ -525,7 +525,7 @@ App.post("/config", authenticateToken, authenticateReferee, authenticateAdmin, a
     }
 })
 
-App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, authenticateReferee, authenticateRole, async(req, res) => {
+App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, authenticateReferee, authenticateBigReferee, authenticateRole, async(req, res) => {
     try{
         res.send(config);
     }catch(error){
