@@ -4,6 +4,7 @@ const tableSpan = document.getElementById('numberOnSlider');
 const tableSlider = document.getElementById('tableSlider');
 const halfSelect = document.getElementById('half');
 const sendButton = document.getElementById('send');
+const resetButton = document.getElementById('resetButton');
 
 updateTables(config.numberOfTables);
 tableSlider.value = config.numberOfTables;
@@ -15,21 +16,49 @@ halfSelect.value = config.half;
 if(config.fightsEnabled == 1){
     beginButton.style.display = "none";
     tableSlider.style.display = "none";
+    resetButton.style.display = "block";
+}else{
+    resetButton.style.display = "none";
 }
 
 beginButton.addEventListener('click', async (event) => {
     if(confirm("Czy na pewno chcesz zacząć walki? Nie będziesz mógł już dodawać zawodników ani edytować kategorii")){
-        await fetch(`${backendURL}/config?token=${token}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                key: "fightsEnabled",
-                value: 1
+        const zawodnicyBezKategorii = (await (await fetch(`${backendURL}/getCompetitorsWithoutCategories?token=${token}`)).json()).length
+
+        if(zawodnicyBezKategorii == 0 || confirm(`Czy na pewno chcesz zacząć walki? ${zawodnicyBezKategorii} zawodników nie ma jeszcze kategorii`)){
+            await fetch(`${backendURL}/config?token=${token}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    key: "fightsEnabled",
+                    value: 1
+                })
             })
-        })
+            window.location.reload();
+        }
     }
+})
+
+
+resetButton.addEventListener('click', async (event) => {
+    await fetch(`${backendURL}/resetFights?token=${token}`, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
+    await fetch(`${backendURL}/config?token=${token}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            key: "fightsEnabled",
+            value: 0
+        })
+    })
     window.location.reload();
 })
 

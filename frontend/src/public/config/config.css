@@ -31,7 +31,7 @@ button{
     transition-duration: 0.2s;
 }
 
-button#beginButton{
+button#beginButton, button#resetButton{
     border-radius: 10px 10px 0 0;
 }
 

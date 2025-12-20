@@ -7,8 +7,8 @@ for(let i = 1; i <= numberOfTables; i++) {
     tableButton.classList.add("tableButton");
     tableButton.href = "/stolikMaly";
     tableButton.textContent = i;
-    tableButton.addEventListener("click", () => {
-        localStorage.setItem("tableNumber", i);
-    })
+    // tableButton.addEventListener("click", () => {
+    //     localStorage.setItem("tableNumber", i);
+    // })
     tableContainer.appendChild(tableButton);
 }
