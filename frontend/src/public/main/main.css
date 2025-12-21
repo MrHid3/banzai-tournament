@@ -73,3 +73,9 @@ body{
 #main-header:has(#goBack:hover) #logout{
     margin-right: 20px;
 }
+
+@media only screen and (max-width: 1100px){
+    #main-header{
+        background-image: none !important;
+    }
+}
