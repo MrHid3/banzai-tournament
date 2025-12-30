@@ -36,6 +36,7 @@ socket.on("award", (data) => {
         setTimeout(() => {
             awardsDiv.removeChild(container)
         }, 200);
+        socket.emit("delete", data.category)
     })
     container.appendChild(destroy);
     awardsDiv.append(container);
@@ -70,3 +71,5 @@ socket.on("call", (data) => {
     container.appendChild(destroy);
     callDiv.append(container);
 })
+
+socket.emit("getOld");

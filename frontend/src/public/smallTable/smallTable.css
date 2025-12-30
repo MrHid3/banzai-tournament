@@ -70,6 +70,8 @@ table td {
     padding: 8px 12px;
     border-right: 1px solid var(--bg-primary);
     color: var(--text-inactive);
+    height: fit-content;
+    word-break: break-word;
 }
 
 table td:last-child {
@@ -181,6 +183,8 @@ table tbody tr.selected {
 .fighter {
     min-width: 100px;
     text-align: center;
+    height: fit-content;
+    word-break: break-word;
 }
 
 .separator {

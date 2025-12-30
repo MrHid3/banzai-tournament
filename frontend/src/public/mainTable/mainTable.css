@@ -101,7 +101,8 @@ h1{
     position: relative;
     border-width: 0 2px 2px 2px;
     animation: create 0.3s ease-in-out;
-    transition-duration: 0.2s;
+    justify-content: center;
+    transition-duration: 1s;
     transition: 0.2s;
     box-shadow: 0px 0px 1px rgba(3, 7, 18, 0.02),
     0px 1px 4px rgba(3, 7, 18, 0.05),
@@ -134,11 +135,12 @@ h1{
 
 .competitor{
     text-wrap: wrap;
-    word-wrap: break-word;
+    word-break: break-all;
     display: block;
     text-align: left !important;
     line-height: 20px;
-    height: 30px;
+    min-height: 30px;
+    height: fit-content;
     border: 2px solid var(--text-active);
     padding: 5px;
     border-radius: 5px;
@@ -177,7 +179,7 @@ h1{
     height: 0;
     padding: 0;
     margin: 0 auto;
-    width: 80%;
+    /*width: 80%;*/
     overflow: hidden;
 }
 
@@ -187,29 +189,33 @@ h1{
 }
 
 @keyframes delete{
-    from{
+    0%{
         height: 200px;
-    }to{
+    /*}50%{*/
+    /*    height: 200px;*/
+    }100%{
         height: 0;
-        width: 20%;
+        /*width: 20%;*/
     }
 }
 
 @keyframes create{
-    from{
-        width: 10%;
+    0%{
+        /*width: 10%;*/
         overflow: hidden;
         color: transparent;
         height: 10px;
         margin-top: 200px;
-    }to{
+    }50%{
+        height: 20%;
+    }100%{
         /*width: 80%;*/
         /*height: 200px;*/
         /*color: var(--text-inactive);*/
         overflow: hidden;
         margin-top: 10px;
-        width: 80%;
-        height: 60%;
+        /*width: 60%;*/
+        height: fit-content;
         color: transparent !important;
     }
 }

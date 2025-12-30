@@ -15,14 +15,17 @@
 .competitor{
     /*text-wrap: wrap;*/
     /*word-wrap: break-word;*/
+    word-break: break-word;
     display: block;
     text-align: left !important;
     line-height: 20px;
-    height: 30px;
+    min-height: 30px;
+    height: fit-content;
     border: 2px solid var(--text-active);
     padding: 5px;
     border-radius: 5px;
     margin: 2px;
+    /*max-width: 25%;*/
     color: var(--text-inactive) !important;
     width: 100% !important;
     /*overflow: hidden;*/
@@ -47,6 +50,7 @@
 
 .awardContainer, .callContainer{
     height: fit-content;
+    max-width: 25%;
     /*color: var(--bg-primary);*/
     display: flex;
     flex-direction: column;

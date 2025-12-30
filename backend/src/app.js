@@ -10,7 +10,6 @@ import { Server  } from "socket.io";
 
 dotenv.config("../");
 
- //TODO: queue for the awards
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -441,6 +440,7 @@ App.post("/callCompetitors", authenticateToken, authenticateReferee, authenticat
     }
 })
 
+let toAward = [];
 App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
         if(config.fightsEnabled == 0){
@@ -506,11 +506,22 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
         }
         // competitors.filter((c) => c.default);
         io.sockets.emit("award", {category: category_id, competitors: competitors})
+        toAward.push({category: category_id, competitors: competitors});
         res.sendStatus(200);
     }catch(error){
         console.log(error);
         res.sendStatus(500);
     }
+})
+io.sockets.on("connection", function(socket){
+    socket.on("getOld", function(data){
+        for(let award of toAward){
+            socket.emit("award", award);
+        }
+    })
+    socket.on("delete", function(data){
+        toAward.splice(toAward.findIndex(a => a.category == data));
+    })
 })
 
 App.post("/config", authenticateToken, authenticateReferee, authenticateAdmin, authenticateRole, async(req, res) => {
@@ -553,6 +564,7 @@ App.get("/getAllResults", authenticateToken, authenticateAdmin, authenticateRole
 App.post("/resetFights", authenticateToken, authenticateAdmin, authenticateRole, async (req, res) => {
     try{
         await pool.query(`TRUNCATE fightResults CASCADE; TRUNCATE tables CASCADE; UPDATE competitors SET place = null; UPDATE categories SET played_out = false;`);
+        toAward = [];
         res.sendStatus(200);
     }catch(error){
         console.log(error);
