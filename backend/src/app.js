@@ -85,7 +85,7 @@ await pool.query("CREATE TABLE IF NOT EXISTS categories(" +
         "table_number int," +
         "category_id int references categories(id) primary key);" +
     "INSERT INTO config (key, value) values ('half', '1') ON CONFLICT (key) DO NOTHING;" +
-    "INSERT INTO config (key, value) values ('numberOfTables', '5') ON CONFLICT (key) DO NOTHING;" +
+    "INSERT INTO config (key, value) values ('numberOfTables', '6') ON CONFLICT (key) DO NOTHING;" +
     "INSERT INTO config (key, value) values ('fightsEnabled', 0) ON CONFLICT (key) DO NOTHING;" +
     "CREATE OR REPLACE PROCEDURE update_duplicates(r_name varchar, r_surname varchar) " +
     "LANGUAGE plpgsql " +
@@ -553,7 +553,7 @@ App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, a
 
 App.get("/getAllResults", authenticateToken, authenticateAdmin, authenticateRole, async(req, res) => {
     try{
-        const result = (await (pool.query("SELECT ca.id, co.name, co.surname, co.location, co.is_name_duplicate, co.place, co.category_id FROM competitors co LEFT JOIN categories ca ON co.category_id = ca.id WHERE ca.played_out IS TRUE ORDER BY ca.id, co.place ASC"))).rows
+        const result = (await (pool.query("SELECT ca.id, co.name, co.surname, co.location, co.is_name_duplicate, co.place, co.category_id, SUM(CASE WHEN fr.loser_id = co.id THEN fr.loser_points ELSE fr.winner_points END) AS points FROM competitors co LEFT JOIN categories ca ON co.category_id = ca.id LEFT JOIN fightResults fr ON fr.winner_id = co.id OR fr.loser_id = co.id WHERE ca.played_out IS TRUE GROUP BY ca.id, co.name, co.surname, co.location, co.is_name_duplicate, co.place, co.category_id ORDER BY ca.id, co.place ASC"))).rows
         res.send(result);
     }catch(error){
         console.log(error);

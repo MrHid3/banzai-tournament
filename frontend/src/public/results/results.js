@@ -23,11 +23,22 @@ for(const [c, competitors] of Object.entries(categoryResults)) {
     for(let i = 0; i < competitors.length; i++){
         const competitor = document.createElement("p");
         competitor.classList.add("competitor");
-        competitor.innerText = /*${competitors[i].place} miejsce - */ `${competitors[i].name} ${competitors[i].surname} ${competitors[i].is_name_duplicate? "- " + (locations.find(l => l.value = competitors[i].location).name) : ""}`;
+        competitor.innerText = `${miejsce(competitors[i].place)} - ${competitors[i].name} ${competitors[i].surname} ${competitors[i].is_name_duplicate? "- " + (locations.find(l => l.value = competitors[i].location).name) : ""} - ${competitors[i].points} pkt`;
         if(competitors[i].absent)
             competitor.classList.add("absent");
         competitorContainer.append(competitor);
     }
     container.appendChild(competitorContainer);
     main.append(container);
+}
+
+function miejsce(number){
+    if(number == 1)
+        return "I"
+    if(number == 2)
+        return "II"
+    if(number == 3)
+        return "III"
+    else
+        return "III"
 }
