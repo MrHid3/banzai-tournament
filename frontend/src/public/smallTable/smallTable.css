@@ -85,6 +85,7 @@ table tbody tr:hover {
 table tbody tr.selected {
     background-color: var(--bg-primary);
     color: var(--text-active);
+    opacity: 0.6;
 }
 
 #Zawolaj {
@@ -105,9 +106,10 @@ table tbody tr.selected {
     background-color: #cc000099;
 }
 
-.martwy {
+.martwy, .brak {
     background-color: #555 !important;
     color: var(--text-inactive);
+    pointer-events: none;
 }
 
 .level-right {

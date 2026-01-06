@@ -44,6 +44,11 @@ function fillTable(tableId, categoryId, competitors){
             }else{
                 Zawodnicy.splice(cc, 1);
             }
+            if(Zawodnicy.length == 0){
+                butZawolaj.classList.add("brak");
+            }else{
+                butZawolaj.classList.remove("brak");
+            }
         });
     });
 }
@@ -170,6 +175,7 @@ async function fillList(categoryId, competitors) {
 //           Guzik Zawołąj
 
 butZawolaj.addEventListener("click", async() => {
+    if (Zawodnicy.length == 0) return;
     const request = await fetch(`${backendURL}/callCompetitors`,{
         method: "POST",
         headers: {
@@ -183,10 +189,10 @@ butZawolaj.addEventListener("click", async() => {
     })
     if(request.ok){
         alert("Zawołanie wysłane");
-        butZawolaj.disabled=true;
+        // butZawolaj.disabled=true;
         butZawolaj.classList.add("martwy");
         setTimeout(()=> {
-            butZawolaj.disabled=false;
+            // butZawolaj.disabled=false;
             butZawolaj.classList.remove("martwy");
         },20000);
     }else{
