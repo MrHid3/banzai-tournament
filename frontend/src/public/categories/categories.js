@@ -141,11 +141,10 @@ async function podzialNaGrupy(){
         } else {
             let nieprzydzieleni = [...zawodnicy];
             let grupy = [];
-
             nieprzydzieleni.sort((a, b) =>
                 String(a.level).localeCompare(String(b.level)) ||
                 KategoriaWagowa(a.weight, b.weight) ||
-                a.age - b.age
+                b.age - a.age
             );
             while(nieprzydzieleni.length > 0) {
                 const pierwszy = nieprzydzieleni.shift();
@@ -168,7 +167,7 @@ async function podzialNaGrupy(){
                 nieprzydzieleni = pozostali;
                 grupy.push(grupa);
             }
-            grupy.sort((a, b) => a[0].age - b[0].age);
+            grupy.sort((a, b) => b[0].age - a[0].age);
             wyswietlGrupy(grupy)
             document.getElementById('zapisz').classList.remove('hidden');
             wyswietlGrupy(grupy)
@@ -197,7 +196,7 @@ function wyswietlGrupy(listaGrup){
 
         addDragDropListener(blokGrupy);
         const i = document.createElement("i");
-        const half = (grupaZawodnikow[0].half === null || grupaZawodnikow[0].half === undefined ? grupaZawodnikow.sort((a, b) => a.age < b.age)[0].age < 11 ? 1 : 2 : grupaZawodnikow[0].half)
+        const half = (grupaZawodnikow[0].half === null || grupaZawodnikow[0].half === undefined ? grupaZawodnikow.sort((a, b) => b.age - a.age)[0].age >= 2015 ? 1 : 2 : grupaZawodnikow[0].half)
         // console.log(grupaZawodnikow[0].half === null)
         i.innerText = `${half} połowa`;
         i.addEventListener("click", (e) => {
@@ -217,7 +216,7 @@ function wyswietlGrupy(listaGrup){
             zawodnikDiv.dataset.id = zawodnik.id;
             zawodnikDiv.innerHTML += `
                         ${zawodnik.name} ${zawodnik.surname}, 
-                        ${zawodnik.age} lat, 
+                        ${zawodnik.age}, 
                         ${Math.round(zawodnik.weight * 10) / 10} kg, 
                         poziom ${zawodnik.level + 1}, 
                         ${zawodnik.location}

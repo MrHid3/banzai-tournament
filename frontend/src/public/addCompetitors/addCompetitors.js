@@ -88,9 +88,14 @@ locationSelect.addEventListener("change", async () => {
     deactivateSave();
 })
 
+function capitalize(string){
+    string = string.toLowerCase();
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 function addCompetitor(id=-1, name="", surname="", age="", weight="", level=-1) {
     const competitorNumber = competitors.length;
-    competitors.push({id: id, name:name, surname: surname, age: age, weight: weight, level: level, exists: true})
+    competitors.push({id: id, name:capitalize(name), surname: capitalize(surname), age: age, weight: weight, level: level, exists: true})
     const inputs = [['text', 'name', name], ['text', 'surname', surname], ['number', 'age', age], ['number', 'weight', weight]];
     const tr = document.createElement("tr");
     tr.classList.add(`competitor-${competitors.length}`);
@@ -186,6 +191,9 @@ function compareCompetitors(){
 }
 
 function changeCompetitor(competitorID, name, value, competitorNumber){
+    if(name == "name" || name == "surname"){
+        value = capitalize(value);
+    }
     if(competitorID !== -1){
         changes = [{id: competitorID, name: name, value: value}, ... changes];
     }

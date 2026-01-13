@@ -19,13 +19,13 @@
         for(let i = 0; i < 10; i++) {
             const letterIndex = Math.floor(Math.random() * 26);
             const letter = String.fromCharCode(lowercaseAsciiStart + letterIndex);
-            const age = Math.floor(Math.random() * 10) + 8;
+            const age = Math.floor(Math.random() * 10) + 2007;
             const competitor = {
                 id: -1,
                 name: letter,
                 surname: letter,
                 age: age,
-                weight: Math.pow((140 + (age - 8) * (Math.floor(Math.random() * 5) + 1))/100, 2) * ((Math.floor(Math.random() * 10) + 16)),
+                weight: Math.pow((140 + ((2026 - age) - 8) * (Math.floor(Math.random() * 5) + 1))/100, 2) * ((Math.floor(Math.random() * 10) + 16)),
                 level: Math.floor(Math.random() * 4),
                 exists: true
             }
@@ -49,13 +49,13 @@
         for(let i = 0; i < 100; i++) {
             const letterIndex = Math.floor(Math.random() * 26);
             const letter = String.fromCharCode(lowercaseAsciiStart + letterIndex);
-            const age = Math.floor(Math.random() * 10) + 8;
+            const age = Math.floor(Math.random() * 10) + 2007;
             const competitor = {
                 id: -1,
                 name: letter,
                 surname: letter,
                 age: age,
-                weight: Math.pow((140 + (age - 8) * (Math.floor(Math.random() * 5) + 1))/100, 2) * ((Math.floor(Math.random() * 10) + 16)),
+                weight: Math.pow((140 + ((2026 - age) - 8) * (Math.floor(Math.random() * 5) + 1))/100, 2) * ((Math.floor(Math.random() * 10) + 16)),
                 level: Math.floor(Math.random() * 4),
                 exists: true
             }
