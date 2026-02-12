@@ -112,8 +112,8 @@ async function fillList(categoryId, competitors) {
             Szukaj = Szukaj.filter(fightResult => {
                 return competitors[j].id == fightResult.winner_id || competitors[j].id == fightResult.loser_id
             });
-
             const matchDone = Szukaj.length>0;
+
             if(matchDone){
                 rowDiv.classList.add("Walczył");
             }else{

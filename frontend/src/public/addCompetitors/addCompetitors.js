@@ -89,7 +89,7 @@ locationSelect.addEventListener("change", async () => {
 })
 
 function capitalize(string){
-    string = string.toLowerCase();
+    string = string.trim().toLowerCase();
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 

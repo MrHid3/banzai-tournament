@@ -405,6 +405,10 @@ App.get("/getCategoryResults/:id", authenticateToken, authenticateAdmin, authent
 
 App.get("/getGroups", authenticateToken, authenticateReferee, authenticateRole, async (req, res) => {
     try{
+        if(config.fightsEnabled == 0){
+            res.send(400);
+            return;
+        }
         const tableNumber = req.query.tableNumber;
         const currentCategories = await pool.query("SELECT t.category_id FROM tables t LEFT JOIN categories c ON c.id = t.category_id WHERE table_number = $1 AND c.half = $2", [tableNumber, config.half]);
         let categories;
@@ -513,6 +517,7 @@ App.post("/endCategory", authenticateToken, authenticateReferee, authenticateRol
         res.sendStatus(500);
     }
 })
+
 io.sockets.on("connection", function(socket){
     socket.on("getOld", function(data){
         for(let award of toAward){
@@ -544,12 +549,6 @@ App.get("/getConfig", authenticateToken, authenticateAdder, authenticateAdmin, a
         res.send(500);
     }
 })
-
-// App.post("/switchHalf", authenticateToken, authenticateAdmin, async(req, res) => {
-//     const {categoryID, half} = req.body;
-//     await pool.query("UPDATE categories SET half = $1 WHERE id = $2", [half, categoryID]);
-//     res.send(200);
-// })
 
 App.get("/getAllResults", authenticateToken, authenticateAdmin, authenticateRole, async(req, res) => {
     try{
